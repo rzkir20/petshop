@@ -1,43 +1,157 @@
-export default function Footer() {
-  const year = new Date().getFullYear()
+import {
+  Facebook,
+  Instagram,
+  Mail,
+  MapPin,
+  PawPrint,
+  Phone,
+  Twitter,
+} from 'lucide-react'
 
+export default function Footer() {
   return (
-    <footer className="mt-20 border-t border-[var(--line)] px-4 pb-14 pt-10 text-[var(--sea-ink-soft)]">
-      <div className="page-wrap flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
-        <p className="m-0 text-sm">
-          &copy; {year} Your name here. All rights reserved.
-        </p>
-        <p className="island-kicker m-0">Built with TanStack Start</p>
-      </div>
-      <div className="mt-4 flex justify-center gap-4">
-        <a
-          href="https://x.com/tan_stack"
-          target="_blank"
-          rel="noreferrer"
-          className="rounded-xl p-2 text-[var(--sea-ink-soft)] transition hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)]"
-        >
-          <span className="sr-only">Follow TanStack on X</span>
-          <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32">
-            <path
-              fill="currentColor"
-              d="M12.6 1h2.2L10 6.48 15.64 15h-4.41L7.78 9.82 3.23 15H1l5.14-5.84L.72 1h4.52l3.12 4.73L12.6 1zm-.77 12.67h1.22L4.57 2.26H3.26l8.57 11.41z"
-            />
-          </svg>
-        </a>
-        <a
-          href="https://github.com/TanStack"
-          target="_blank"
-          rel="noreferrer"
-          className="rounded-xl p-2 text-[var(--sea-ink-soft)] transition hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)]"
-        >
-          <span className="sr-only">Go to TanStack GitHub</span>
-          <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32">
-            <path
-              fill="currentColor"
-              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"
-            />
-          </svg>
-        </a>
+    <footer className="bg-slate-900 pt-20 pb-10 text-slate-300">
+      <div className="mx-auto w-full container px-4 sm:px-6 lg:px-8">
+        <div className="mb-16 grid gap-12 md:grid-cols-4">
+          <div className="space-y-6">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500 text-white">
+                <PawPrint size={18} />
+              </div>
+              <span className="font-display text-xl font-bold text-white">
+                PawsomeShop
+              </span>
+            </div>
+            <p className="text-sm leading-relaxed">
+              The ultimate destination for premium pet supplies. We care for
+              your pets as much as you do.
+            </p>
+            <div className="flex gap-4">
+              {[
+                { key: 'facebook', icon: <Facebook size={16} /> },
+                { key: 'instagram', icon: <Instagram size={16} /> },
+                { key: 'twitter', icon: <Twitter size={16} /> },
+              ].map((item) => (
+                <a
+                  key={item.key}
+                  href="#"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-800 text-white transition-colors hover:bg-emerald-500"
+                >
+                  {item.icon}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h4 className="mb-6 font-bold text-white">Quick Links</h4>
+            <ul className="space-y-4 text-sm">
+              <li>
+                <a
+                  href="#shop"
+                  className="transition-colors hover:text-emerald-500"
+                >
+                  Shop Products
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#about"
+                  className="transition-colors hover:text-emerald-500"
+                >
+                  Our Story
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#blog"
+                  className="transition-colors hover:text-emerald-500"
+                >
+                  Pet Blog
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#deals"
+                  className="transition-colors hover:text-emerald-500"
+                >
+                  Flash Deals
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="mb-6 font-bold text-white">Customer Care</h4>
+            <ul className="space-y-4 text-sm">
+              <li>
+                <a
+                  href="#help"
+                  className="transition-colors hover:text-emerald-500"
+                >
+                  Help Center
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#shipping"
+                  className="transition-colors hover:text-emerald-500"
+                >
+                  Shipping Info
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#returns"
+                  className="transition-colors hover:text-emerald-500"
+                >
+                  Returns & Refunds
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#tracking"
+                  className="transition-colors hover:text-emerald-500"
+                >
+                  Order Tracking
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="mb-6 font-bold text-white">Contact Us</h4>
+            <ul className="space-y-4 text-sm">
+              <li className="flex items-center gap-3">
+                <MapPin size={16} className="text-emerald-500" />
+                <span>123 Pet Lane, Paw City, PC 54321</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Phone size={16} className="text-emerald-500" />
+                <span>+1 (800) PAW-SOME</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Mail size={16} className="text-emerald-500" />
+                <span>hello@pawsomeshop.com</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-10 text-xs md:flex-row">
+          <p>© 2024 PawsomeShop. All rights reserved.</p>
+          <div className="flex gap-6">
+            <a href="#privacy-policy" className="hover:text-white">
+              Privacy Policy
+            </a>
+            <a href="#terms" className="hover:text-white">
+              Terms of Service
+            </a>
+            <a href="#cookies" className="hover:text-white">
+              Cookie Settings
+            </a>
+          </div>
+        </div>
       </div>
     </footer>
   )

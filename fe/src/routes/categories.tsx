@@ -76,7 +76,7 @@ function RouteComponent() {
   return (
     <>
       <section className="bg-emerald-50/50 py-10">
-        <div className="mx-auto w-full container px-4 text-center sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-full xl:container px-4 text-center sm:px-6 lg:px-8">
           <h1 className="font-display mb-4 text-5xl font-bold text-slate-900">
             Shop by Category
           </h1>
@@ -87,7 +87,7 @@ function RouteComponent() {
         </div>
       </section>
 
-      <section className="mx-auto w-full container px-4 py-10 sm:px-6 lg:px-8">
+      <section className="mx-auto w-full max-w-full xl:container px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
           {categories.map((category) => (
             <a
@@ -130,7 +130,7 @@ function RouteComponent() {
       </section>
 
       <section className="bg-slate-50 py-10">
-        <div className="mx-auto w-full container px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-full xl:container px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-[4rem] bg-emerald-500 p-10 lg:p-20">
             <div className="relative z-10 grid items-center gap-12 lg:grid-cols-2">
               <div className="text-white">

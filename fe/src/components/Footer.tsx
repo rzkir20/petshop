@@ -8,11 +8,13 @@ import {
   Twitter,
 } from 'lucide-react'
 
+import { Link } from '@tanstack/react-router'
+
 export default function Footer() {
   return (
     <footer className="bg-slate-900 pt-20 pb-10 text-slate-300">
-      <div className="mx-auto w-full container px-4 sm:px-6 lg:px-8">
-        <div className="mb-16 grid gap-12 md:grid-cols-4">
+      <div className="mx-auto w-full max-w-full xl:container px-4 sm:px-6 lg:px-8">
+        <div className="mb-16 grid gap-12 xl:grid-cols-4">
           <div className="space-y-6">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500 text-white">
@@ -47,36 +49,36 @@ export default function Footer() {
             <h4 className="mb-6 font-bold text-white">Quick Links</h4>
             <ul className="space-y-4 text-sm">
               <li>
-                <a
-                  href="#shop"
+                <Link
+                  to="/shop"
                   className="transition-colors hover:text-emerald-500"
                 >
                   Shop Products
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#about"
+                <Link
+                  to="/about"
                   className="transition-colors hover:text-emerald-500"
                 >
                   Our Story
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#blog"
+                <Link
+                  to="/blog"
                   className="transition-colors hover:text-emerald-500"
                 >
                   Pet Blog
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#deals"
+                <Link
+                  to="/deals"
                   className="transition-colors hover:text-emerald-500"
                 >
                   Flash Deals
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -85,28 +87,28 @@ export default function Footer() {
             <h4 className="mb-6 font-bold text-white">Customer Care</h4>
             <ul className="space-y-4 text-sm">
               <li>
-                <a
-                  href="#help"
+                <Link
+                  to="/help"
                   className="transition-colors hover:text-emerald-500"
                 >
                   Help Center
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#shipping"
+                <Link
+                  to="/shipping"
                   className="transition-colors hover:text-emerald-500"
                 >
                   Shipping Info
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#returns"
+                <Link
+                  to="/returns"
                   className="transition-colors hover:text-emerald-500"
                 >
                   Returns & Refunds
-                </a>
+                </Link>
               </li>
               <li>
                 <a
@@ -141,15 +143,15 @@ export default function Footer() {
         <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-10 text-xs md:flex-row">
           <p>© 2024 PawsomeShop. All rights reserved.</p>
           <div className="flex gap-6">
-            <a href="#privacy-policy" className="hover:text-white">
+            <Link to="/rules/privacy-policy" className="hover:text-white">
               Privacy Policy
-            </a>
-            <a href="#terms" className="hover:text-white">
+            </Link>
+            <Link to="/rules/terms" className="hover:text-white">
               Terms of Service
-            </a>
-            <a href="#cookies" className="hover:text-white">
+            </Link>
+            <Link to="/rules/cookies" className="hover:text-white">
               Cookie Settings
-            </a>
+            </Link>
           </div>
         </div>
       </div>

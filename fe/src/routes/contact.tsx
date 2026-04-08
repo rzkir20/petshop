@@ -42,7 +42,7 @@ function RouteComponent() {
   return (
     <>
       <section className="bg-emerald-50/50 py-10">
-        <div className="mx-auto w-full container px-4 text-center sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-full xl:container px-4 text-center sm:px-6 lg:px-8">
           <nav
             className="mb-6 flex justify-center text-sm font-medium text-slate-500"
             aria-label="Breadcrumb"
@@ -67,7 +67,7 @@ function RouteComponent() {
         </div>
       </section>
 
-      <section className="mx-auto grid w-full container gap-16 px-4 py-10 sm:px-6 lg:grid-cols-12 lg:px-8">
+      <section className="mx-auto grid w-full max-w-full xl:container gap-16 px-4 py-10 sm:px-6 lg:grid-cols-12 lg:px-8">
         <div className="rounded-[3rem] border border-slate-100 bg-white p-8 shadow-xl shadow-slate-100/50 md:p-12 lg:col-span-7">
           <h2 className="font-display mb-8 text-3xl font-bold">
             Send us a Message
@@ -238,7 +238,7 @@ function RouteComponent() {
         </div>
       </section>
 
-      <section className="mx-auto w-full container px-4 py-10 sm:px-6 lg:px-8">
+      <section className="mx-auto w-full max-w-full xl:container px-4 py-10 sm:px-6 lg:px-8">
         <div className="relative h-[400px] w-full overflow-hidden rounded-[3rem] border border-slate-200 bg-slate-100">
           <img
             src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1440&q=80"

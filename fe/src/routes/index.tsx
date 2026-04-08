@@ -111,7 +111,7 @@ function App() {
   return (
     <main id="home" className="min-h-screen bg-white text-slate-900">
       <section className="hero-gradient relative overflow-hidden pt-10 pb-20 lg:pt-20 lg:pb-32">
-        <div className="mx-auto grid w-full container items-center gap-16 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
+        <div className="mx-auto grid w-full max-w-full xl:container items-center gap-16 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
           <div className="relative z-10 space-y-8">
             <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-600">
               <Sparkles size={16} /> <span>New Arrivals are here!</span>
@@ -158,7 +158,7 @@ function App() {
       </section>
 
       <section id="categories" className="py-20">
-        <div className="mx-auto w-full container px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-full xl:container px-4 sm:px-6 lg:px-8">
           <div className="mb-12 flex items-end justify-between">
             <div>
               <h2 className="font-display mb-2 text-3xl font-bold">
@@ -195,7 +195,7 @@ function App() {
       </section>
 
       <section id="shop" className="bg-slate-50 py-20">
-        <div className="mx-auto w-full container px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-full xl:container px-4 sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
             <h2 className="font-display mb-4 text-4xl font-bold">
               Featured Favorites
@@ -256,7 +256,7 @@ function App() {
       </section>
 
       <section className="py-20">
-        <div className="mx-auto w-full container px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-full xl:container px-4 sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
             <h2 className="font-display mb-4 text-4xl font-bold">
               Words from Pet Parents
@@ -292,7 +292,7 @@ function App() {
       </section>
 
       <section id="deals" className="py-16">
-        <div className="mx-auto w-full container px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-full xl:container px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center gap-12 rounded-[3rem] border border-white/20 bg-emerald-500 p-8 lg:flex-row lg:p-16">
             <div className="space-y-4 text-white">
               <h2 className="font-display text-4xl font-bold">

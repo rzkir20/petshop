@@ -9,22 +9,42 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ShopRouteImport } from './routes/shop'
+import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as ReturnsRouteImport } from './routes/returns'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as DealsRouteImport } from './routes/deals'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShopIndexRouteImport } from './routes/shop/index'
+import { Route as BlogIndexRouteImport } from './routes/blog/index'
+import { Route as RulesTermsRouteImport } from './routes/rules/terms'
+import { Route as RulesPrivacyPolicyRouteImport } from './routes/rules/privacy-policy'
+import { Route as RulesCookiesRouteImport } from './routes/rules/cookies'
+import { Route as authSignupRouteImport } from './routes/(auth)/signup'
+import { Route as authSigninRouteImport } from './routes/(auth)/signin'
 
-const ShopRoute = ShopRouteImport.update({
-  id: '/shop',
-  path: '/shop',
+const ShippingRoute = ShippingRouteImport.update({
+  id: '/shipping',
+  path: '/shipping',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReturnsRoute = ReturnsRouteImport.update({
+  id: '/returns',
+  path: '/returns',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DealsRoute = DealsRouteImport.update({
@@ -47,87 +67,197 @@ const CartRoute = CartRouteImport.update({
   path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopIndexRoute = ShopIndexRouteImport.update({
+  id: '/shop/',
+  path: '/shop/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RulesTermsRoute = RulesTermsRouteImport.update({
+  id: '/rules/terms',
+  path: '/rules/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RulesPrivacyPolicyRoute = RulesPrivacyPolicyRouteImport.update({
+  id: '/rules/privacy-policy',
+  path: '/rules/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RulesCookiesRoute = RulesCookiesRouteImport.update({
+  id: '/rules/cookies',
+  path: '/rules/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authSignupRoute = authSignupRouteImport.update({
+  id: '/(auth)/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authSigninRoute = authSigninRouteImport.update({
+  id: '/(auth)/signin',
+  path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/deals': typeof DealsRoute
+  '/help': typeof HelpRoute
+  '/returns': typeof ReturnsRoute
   '/search': typeof SearchRoute
-  '/shop': typeof ShopRoute
+  '/shipping': typeof ShippingRoute
+  '/signin': typeof authSigninRoute
+  '/signup': typeof authSignupRoute
+  '/rules/cookies': typeof RulesCookiesRoute
+  '/rules/privacy-policy': typeof RulesPrivacyPolicyRoute
+  '/rules/terms': typeof RulesTermsRoute
+  '/blog/': typeof BlogIndexRoute
+  '/shop/': typeof ShopIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/deals': typeof DealsRoute
+  '/help': typeof HelpRoute
+  '/returns': typeof ReturnsRoute
   '/search': typeof SearchRoute
-  '/shop': typeof ShopRoute
+  '/shipping': typeof ShippingRoute
+  '/signin': typeof authSigninRoute
+  '/signup': typeof authSignupRoute
+  '/rules/cookies': typeof RulesCookiesRoute
+  '/rules/privacy-policy': typeof RulesPrivacyPolicyRoute
+  '/rules/terms': typeof RulesTermsRoute
+  '/blog': typeof BlogIndexRoute
+  '/shop': typeof ShopIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/deals': typeof DealsRoute
+  '/help': typeof HelpRoute
+  '/returns': typeof ReturnsRoute
   '/search': typeof SearchRoute
-  '/shop': typeof ShopRoute
+  '/shipping': typeof ShippingRoute
+  '/(auth)/signin': typeof authSigninRoute
+  '/(auth)/signup': typeof authSignupRoute
+  '/rules/cookies': typeof RulesCookiesRoute
+  '/rules/privacy-policy': typeof RulesPrivacyPolicyRoute
+  '/rules/terms': typeof RulesTermsRoute
+  '/blog/': typeof BlogIndexRoute
+  '/shop/': typeof ShopIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/cart'
     | '/categories'
     | '/contact'
     | '/deals'
+    | '/help'
+    | '/returns'
     | '/search'
-    | '/shop'
+    | '/shipping'
+    | '/signin'
+    | '/signup'
+    | '/rules/cookies'
+    | '/rules/privacy-policy'
+    | '/rules/terms'
+    | '/blog/'
+    | '/shop/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/cart'
     | '/categories'
     | '/contact'
     | '/deals'
+    | '/help'
+    | '/returns'
     | '/search'
+    | '/shipping'
+    | '/signin'
+    | '/signup'
+    | '/rules/cookies'
+    | '/rules/privacy-policy'
+    | '/rules/terms'
+    | '/blog'
     | '/shop'
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/cart'
     | '/categories'
     | '/contact'
     | '/deals'
+    | '/help'
+    | '/returns'
     | '/search'
-    | '/shop'
+    | '/shipping'
+    | '/(auth)/signin'
+    | '/(auth)/signup'
+    | '/rules/cookies'
+    | '/rules/privacy-policy'
+    | '/rules/terms'
+    | '/blog/'
+    | '/shop/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   CartRoute: typeof CartRoute
   CategoriesRoute: typeof CategoriesRoute
   ContactRoute: typeof ContactRoute
   DealsRoute: typeof DealsRoute
+  HelpRoute: typeof HelpRoute
+  ReturnsRoute: typeof ReturnsRoute
   SearchRoute: typeof SearchRoute
-  ShopRoute: typeof ShopRoute
+  ShippingRoute: typeof ShippingRoute
+  authSigninRoute: typeof authSigninRoute
+  authSignupRoute: typeof authSignupRoute
+  RulesCookiesRoute: typeof RulesCookiesRoute
+  RulesPrivacyPolicyRoute: typeof RulesPrivacyPolicyRoute
+  RulesTermsRoute: typeof RulesTermsRoute
+  BlogIndexRoute: typeof BlogIndexRoute
+  ShopIndexRoute: typeof ShopIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/shop': {
-      id: '/shop'
-      path: '/shop'
-      fullPath: '/shop'
-      preLoaderRoute: typeof ShopRouteImport
+    '/shipping': {
+      id: '/shipping'
+      path: '/shipping'
+      fullPath: '/shipping'
+      preLoaderRoute: typeof ShippingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -135,6 +265,20 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/returns': {
+      id: '/returns'
+      path: '/returns'
+      fullPath: '/returns'
+      preLoaderRoute: typeof ReturnsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/deals': {
@@ -165,6 +309,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -172,17 +323,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shop/': {
+      id: '/shop/'
+      path: '/shop'
+      fullPath: '/shop/'
+      preLoaderRoute: typeof ShopIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rules/terms': {
+      id: '/rules/terms'
+      path: '/rules/terms'
+      fullPath: '/rules/terms'
+      preLoaderRoute: typeof RulesTermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rules/privacy-policy': {
+      id: '/rules/privacy-policy'
+      path: '/rules/privacy-policy'
+      fullPath: '/rules/privacy-policy'
+      preLoaderRoute: typeof RulesPrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rules/cookies': {
+      id: '/rules/cookies'
+      path: '/rules/cookies'
+      fullPath: '/rules/cookies'
+      preLoaderRoute: typeof RulesCookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/signup': {
+      id: '/(auth)/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof authSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/signin': {
+      id: '/(auth)/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof authSigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   CartRoute: CartRoute,
   CategoriesRoute: CategoriesRoute,
   ContactRoute: ContactRoute,
   DealsRoute: DealsRoute,
+  HelpRoute: HelpRoute,
+  ReturnsRoute: ReturnsRoute,
   SearchRoute: SearchRoute,
-  ShopRoute: ShopRoute,
+  ShippingRoute: ShippingRoute,
+  authSigninRoute: authSigninRoute,
+  authSignupRoute: authSignupRoute,
+  RulesCookiesRoute: RulesCookiesRoute,
+  RulesPrivacyPolicyRoute: RulesPrivacyPolicyRoute,
+  RulesTermsRoute: RulesTermsRoute,
+  BlogIndexRoute: BlogIndexRoute,
+  ShopIndexRoute: ShopIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

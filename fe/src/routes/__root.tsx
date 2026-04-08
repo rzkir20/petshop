@@ -3,11 +3,8 @@ import {
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import Pathname from '../hooks/Pathname'
 
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
+import Pathname from '../hooks/Pathname'
 
 import appCss from '../styles.css?url'
 
@@ -30,7 +27,47 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'PawsomeShop - Premium Pet Supplies & Care',
+      },
+      {
+        name: 'description',
+        content:
+          'PawsomeShop helps pet parents discover premium food, toys, accessories, and trusted care tips for dogs, cats, birds, and aquatic pets.',
+      },
+      {
+        name: 'keywords',
+        content:
+          'pet shop, pet supplies, dog food, cat toys, pet accessories, pet care, pawsomeshop',
+      },
+      {
+        name: 'robots',
+        content: 'index, follow',
+      },
+      {
+        property: 'og:title',
+        content: 'PawsomeShop - Premium Pet Supplies & Care',
+      },
+      {
+        property: 'og:description',
+        content:
+          'Shop trusted pet essentials and explore practical pet care resources in one place.',
+      },
+      {
+        property: 'og:type',
+        content: 'website',
+      },
+      {
+        name: 'twitter:card',
+        content: 'summary_large_image',
+      },
+      {
+        name: 'twitter:title',
+        content: 'PawsomeShop - Premium Pet Supplies & Care',
+      },
+      {
+        name: 'twitter:description',
+        content:
+          'Quality pet products, friendly support, and helpful guides for every pet parent.',
       },
     ],
     links: [
@@ -52,18 +89,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <Pathname>{children}</Pathname>
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            TanStackQueryDevtools,
-          ]}
-        />
         <Scripts />
       </body>
     </html>

@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+
 import {
   ChevronDown,
   ChevronLeft,
@@ -8,10 +9,6 @@ import {
   ShoppingCart,
   Star,
 } from 'lucide-react'
-
-export const Route = createFileRoute('/shop')({
-  component: RouteComponent,
-})
 
 const categoryFilters = [
   { label: 'All Pets', count: 248, checked: true },
@@ -78,11 +75,15 @@ const products = [
   },
 ]
 
+export const Route = createFileRoute('/shop/')({
+  component: RouteComponent,
+})
+
 function RouteComponent() {
   return (
     <>
       <section className="bg-emerald-50/50 py-10">
-        <div className="mx-auto w-full container px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-full xl:container px-4 sm:px-6 lg:px-8">
           <nav
             className="mb-4 flex text-sm font-medium text-slate-500"
             aria-label="Breadcrumb"
@@ -107,7 +108,7 @@ function RouteComponent() {
         </div>
       </section>
 
-      <section className="mx-auto w-full container px-4 py-10 sm:px-6 lg:px-8">
+      <section className="mx-auto w-full max-w-full xl:container px-4 py-10 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-12 lg:flex-row">
           <aside className="w-full shrink-0 lg:w-72">
             <div className="sticky top-28 space-y-10">
@@ -318,7 +319,7 @@ function RouteComponent() {
       </section>
 
       <section className="relative overflow-hidden py-10">
-        <div className="mx-auto w-full container px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-full xl:container px-4 sm:px-6 lg:px-8">
           <div className="rounded-[4rem] border border-white/20 bg-emerald-500 p-10 lg:p-20">
             <div className="grid items-center gap-12 lg:grid-cols-2">
               <div className="text-white">

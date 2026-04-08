@@ -62,7 +62,7 @@ function RouteComponent() {
   return (
     <>
       <main className="flex-1 py-10">
-        <div className="mx-auto container px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-full xl:container px-4 sm:px-6 lg:px-8">
           <section className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-center">
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm font-medium text-slate-500">

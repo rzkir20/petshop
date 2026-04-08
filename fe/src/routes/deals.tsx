@@ -134,7 +134,7 @@ function RouteComponent() {
   return (
     <>
       <div className="sticky top-20 z-40 border-b border-white/10 bg-slate-900 py-3 text-white">
-        <div className="mx-auto flex container flex-col items-center justify-center gap-4 px-4 md:flex-row">
+        <div className="mx-auto flex max-w-full xl:container flex-col items-center justify-center gap-4 px-4 md:flex-row">
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 animate-pulse rounded-full bg-orange-500" />
             <p className="text-sm font-bold tracking-wider uppercase">
@@ -171,7 +171,7 @@ function RouteComponent() {
       </div>
 
       <section className="relative overflow-hidden py-10">
-        <div className="mx-auto container px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-full xl:container px-4 sm:px-6 lg:px-8">
           <div className="relative flex flex-col items-center gap-12 overflow-hidden rounded-[3rem] bg-orange-500 p-8 lg:flex-row lg:p-16">
             <div className="relative z-10 space-y-6 text-center lg:w-3/5 lg:text-left">
               <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 text-sm font-bold tracking-widest text-white uppercase backdrop-blur-md">
@@ -218,7 +218,7 @@ function RouteComponent() {
         </div>
       </section>
 
-      <section className="mx-auto container px-4 pb-10 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-full xl:container px-4 pb-10 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center justify-between gap-8 border-b border-slate-100 pb-8 md:flex-row">
           <div className="flex flex-wrap justify-center gap-3">
             <button className="rounded-full bg-emerald-500 px-6 py-3 font-bold text-white shadow-lg shadow-emerald-200 transition-all">
@@ -247,7 +247,7 @@ function RouteComponent() {
 
       <section
         id="deals-grid"
-        className="mx-auto container px-4 py-10 sm:px-6 lg:px-8"
+        className="mx-auto max-w-full xl:container px-4 py-10 sm:px-6 lg:px-8"
       >
         <div className="mb-20 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {deals.map((deal) => (
@@ -319,7 +319,7 @@ function RouteComponent() {
       </section>
 
       <section className="relative overflow-hidden bg-slate-900 py-16">
-        <div className="relative z-10 mx-auto container px-4 text-center sm:px-6 lg:px-8">
+        <div className="relative z-10 mx-auto max-w-full xl:container px-4 text-center sm:px-6 lg:px-8">
           <h2 className="font-display mb-6 text-3xl font-bold text-white lg:text-4xl">
             Don&apos;t Wait! These Deals Disappear Fast.
           </h2>

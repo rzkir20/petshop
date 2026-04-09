@@ -1,18 +1,20 @@
 const express = require("express");
-const app = express();
-
 const dotenv = require("dotenv");
 
-dotenv.config({
-  path: ".env",
-});
+const authRoutes = require("./routes/auth.routes");
+
+dotenv.config({ path: ".env" });
+
+const app = express();
+app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-const port = process.env.PORT;
+app.use("/auth", authRoutes);
 
+const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

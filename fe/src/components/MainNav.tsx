@@ -1,6 +1,17 @@
 import { Bell, Search } from 'lucide-react'
 
+import { useAuth } from '../context/AuthContext'
+
 export default function MainNav() {
+  const { user } = useAuth()
+  const displayName = user?.name.trim() || 'Admin Pawsome'
+  const displayEmail = user?.email.trim() || 'Store Manager'
+  const displayAvatar =
+    user?.pictures?.trim() ||
+    `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
+      displayName,
+    )}`
+
   return (
     <header className="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-emerald-50 bg-white/80 px-8 backdrop-blur-md">
       <div className="relative w-96 max-w-full">
@@ -26,16 +37,16 @@ export default function MainNav() {
         <div className="h-8 w-px bg-emerald-100" />
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <p className="text-sm font-bold">Admin Pawsome</p>
-            <p className="text-[10px] text-gray-400">Store Manager</p>
+            <p className="text-sm font-bold">{displayName}</p>
+            <p className="text-[10px] text-gray-400">{displayEmail}</p>
           </div>
           <button
             type="button"
             className="h-10 w-10 rounded-full border-2 border-emerald-100 p-0.5"
           >
             <img
-              src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
-              alt="Avatar"
+              src={displayAvatar}
+              alt={displayName}
               className="h-full w-full rounded-full bg-emerald-50"
             />
           </button>

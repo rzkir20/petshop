@@ -6,6 +6,8 @@ import {
 
 import Pathname from '../hooks/Pathname'
 
+import { AuthProvider } from '../context/AuthContext'
+
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
@@ -88,7 +90,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <Pathname>{children}</Pathname>
+        <AuthProvider>
+          <Pathname>{children}</Pathname>
+        </AuthProvider>
         <Scripts />
       </body>
     </html>

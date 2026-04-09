@@ -72,9 +72,12 @@ function DashboardPage() {
     <div className="space-y-8 p-8">
       <section className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold tracking-tight">Dashboard Overview</h1>
+          <h1 className="font-display text-3xl font-bold tracking-tight">
+            Dashboard Overview
+          </h1>
           <p className="mt-1 text-gray-500">
-            Welcome back! Here&apos;s what&apos;s happening with your pet shop today.
+            Welcome back! Here&apos;s what&apos;s happening with your pet shop
+            today.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -124,7 +127,9 @@ function DashboardPage() {
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-400">{item.title}</p>
+                <p className="text-sm font-medium text-gray-400">
+                  {item.title}
+                </p>
                 <h3 className="mt-1 text-2xl font-bold">{item.value}</h3>
               </div>
             </article>
@@ -145,13 +150,19 @@ function DashboardPage() {
           <div className="relative flex h-64 items-end justify-between gap-4">
             <div className="pointer-events-none absolute inset-0 flex flex-col justify-between text-xs text-gray-300">
               {['50k', '40k', '30k', '20k', '10k', '0'].map((mark) => (
-                <div key={mark} className={mark === '0' ? '' : 'border-b border-gray-50 pb-1'}>
+                <div
+                  key={mark}
+                  className={mark === '0' ? '' : 'border-b border-gray-50 pb-1'}
+                >
                   {mark}
                 </div>
               ))}
             </div>
             {bars.map((bar) => (
-              <div key={bar.day} className="group flex flex-1 flex-col items-center gap-3">
+              <div
+                key={bar.day}
+                className="group flex flex-1 flex-col items-center gap-3"
+              >
                 <div
                   className={`relative w-full rounded-t-xl ${bar.height} ${
                     bar.active
@@ -176,7 +187,10 @@ function DashboardPage() {
         <aside className="rounded-[40px] border border-emerald-50 bg-white p-8 shadow-sm">
           <div className="mb-8 flex items-center justify-between">
             <h3 className="font-display text-xl font-bold">Live Feed</h3>
-            <button type="button" className="text-xs font-bold text-emerald-500">
+            <button
+              type="button"
+              className="text-xs font-bold text-emerald-500"
+            >
               View All
             </button>
           </div>
@@ -196,20 +210,24 @@ function DashboardPage() {
               text={
                 <>
                   <span className="font-bold">Budi Santoso</span> signed up as a{' '}
-                  <span className="font-medium text-emerald-500">VIP Member</span>
+                  <span className="font-medium text-emerald-500">
+                    VIP Member
+                  </span>
                 </>
               }
               time="15 mins ago"
             />
             <div className="flex gap-4">
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-500">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-500">
                 <Star size={18} />
               </div>
               <div>
                 <p className="text-sm">
                   <span className="font-bold">Ani Wijaya</span> left a{' '}
-                  <span className="font-medium text-yellow-500">5-star review</span> for Grooming
-                  Kit
+                  <span className="font-medium text-yellow-500">
+                    5-star review
+                  </span>{' '}
+                  for Grooming Kit
                 </p>
                 <span className="mt-1 text-[10px] font-bold text-gray-400 uppercase">
                   1 hour ago
@@ -221,7 +239,8 @@ function DashboardPage() {
               text={
                 <>
                   <span className="font-bold">Kevin Lie</span> added{' '}
-                  <span className="font-medium">Cat Scratching Post</span> to wishlist
+                  <span className="font-medium">Cat Scratching Post</span> to
+                  wishlist
                 </>
               }
               time="3 hours ago"
@@ -245,16 +264,18 @@ function DashboardPage() {
             <table className="w-full text-left">
               <thead className="bg-gray-50/50">
                 <tr>
-                  {['ID Order', 'Product', 'Date', 'Status', 'Amount'].map((heading) => (
-                    <th
-                      key={heading}
-                      className={`px-8 py-4 text-[10px] font-bold tracking-widest text-gray-400 uppercase ${
-                        heading === 'Amount' ? 'text-right' : ''
-                      }`}
-                    >
-                      {heading}
-                    </th>
-                  ))}
+                  {['ID Order', 'Product', 'Date', 'Status', 'Amount'].map(
+                    (heading) => (
+                      <th
+                        key={heading}
+                        className={`px-8 py-4 text-[10px] font-bold tracking-widest text-gray-400 uppercase ${
+                          heading === 'Amount' ? 'text-right' : ''
+                        }`}
+                      >
+                        {heading}
+                      </th>
+                    ),
+                  )}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -291,7 +312,9 @@ function DashboardPage() {
         </article>
 
         <aside className="flex flex-col rounded-[40px] bg-[#173a40] p-8 text-white">
-          <h3 className="font-display mb-6 text-xl font-bold">Low Stock Alerts</h3>
+          <h3 className="font-display mb-6 text-xl font-bold">
+            Low Stock Alerts
+          </h3>
           <div className="flex-1 space-y-4">
             <LowStockItem title="Bird Seed 1kg" stock="Only 4 items left" />
             <LowStockItem title="Chew Bone XL" stock="Only 2 items left" />
@@ -328,12 +351,18 @@ function FeedItem({
 }) {
   return (
     <div className="flex gap-4">
-      <div className="flex-shrink-0">
-        <img src={avatar} className="h-10 w-10 rounded-full bg-orange-50" alt="Customer avatar" />
+      <div className="shrink-0">
+        <img
+          src={avatar}
+          className="h-10 w-10 rounded-full bg-orange-50"
+          alt="Customer avatar"
+        />
       </div>
       <div>
         <p className="text-sm">{text}</p>
-        <span className="mt-1 text-[10px] font-bold text-gray-400 uppercase">{time}</span>
+        <span className="mt-1 text-[10px] font-bold text-gray-400 uppercase">
+          {time}
+        </span>
       </div>
     </div>
   )
@@ -373,7 +402,11 @@ function OrderRow({
       </td>
       <td className="px-8 py-4 text-sm text-gray-500">{date}</td>
       <td className="px-8 py-4">
-        <span className={`rounded-full px-3 py-1 text-[10px] font-bold ${statusClass}`}>{status}</span>
+        <span
+          className={`rounded-full px-3 py-1 text-[10px] font-bold ${statusClass}`}
+        >
+          {status}
+        </span>
       </td>
       <td className="px-8 py-4 text-right text-sm font-bold">{amount}</td>
     </tr>

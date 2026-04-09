@@ -1,4 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
+import {
+  Navigate,
+  createFileRoute,
+  redirect,
+  useNavigate,
+} from '@tanstack/react-router'
+
 import {
   CheckCircle2,
   LockKeyhole,
@@ -6,17 +12,71 @@ import {
   PawPrint,
   UserRound,
 } from 'lucide-react'
+import React, { useId, useState } from 'react'
+
+import { useAuth } from '../../context/AuthContext'
+
+import { getSession } from '../../services/auth.service'
 
 export const Route = createFileRoute('/(auth)/signup')({
+  beforeLoad: async () => {
+    try {
+      await getSession()
+    } catch {
+      // No active session, stay on auth page.
+      return
+    }
+    throw redirect({ to: '/dashboard' })
+  },
   component: SignUpPage,
 })
 
 function SignUpPage() {
+  const navigate = useNavigate()
+  const { signup, status } = useAuth()
+
+  const errorId = useId()
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    agree: false,
+  })
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  if (status === 'loading') return null
+  if (status === 'authenticated') return <Navigate to="/dashboard" />
+
   const benefits = [
     'Get member-only discounts and coupons',
     'Save multiple pet profiles for recommendations',
     'Faster checkout with saved preferences',
   ]
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setError(null)
+
+    if (!form.agree) {
+      setError('Please agree to the Terms of Service and Privacy Policy.')
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      await signup({
+        name: form.name,
+        email: form.email,
+        password: form.password,
+      })
+      await navigate({ to: '/dashboard' })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Signup failed')
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
@@ -57,7 +117,7 @@ function SignUpPage() {
               Set up your account to get started.
             </p>
 
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={onSubmit}>
               <div className="space-y-2">
                 <label
                   htmlFor="fullname"
@@ -72,6 +132,12 @@ function SignUpPage() {
                     type="text"
                     placeholder="Your full name"
                     className="w-full border-none bg-transparent px-3 py-3.5 outline-none"
+                    value={form.name}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, name: e.target.value }))
+                    }
+                    autoComplete="name"
+                    required
                   />
                 </div>
               </div>
@@ -90,6 +156,12 @@ function SignUpPage() {
                     type="email"
                     placeholder="you@example.com"
                     className="w-full border-none bg-transparent px-3 py-3.5 outline-none"
+                    value={form.email}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, email: e.target.value }))
+                    }
+                    autoComplete="email"
+                    required
                   />
                 </div>
               </div>
@@ -108,6 +180,13 @@ function SignUpPage() {
                     type="password"
                     placeholder="Create a secure password"
                     className="w-full border-none bg-transparent px-3 py-3.5 outline-none"
+                    value={form.password}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, password: e.target.value }))
+                    }
+                    autoComplete="new-password"
+                    minLength={6}
+                    required
                   />
                 </div>
                 <p className="text-xs text-slate-400">
@@ -119,15 +198,31 @@ function SignUpPage() {
                 <input
                   type="checkbox"
                   className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-500"
+                  checked={form.agree}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, agree: e.target.checked }))
+                  }
                 />
                 I agree to the Terms of Service and Privacy Policy.
               </label>
 
+              {error ? (
+                <p
+                  id={errorId}
+                  role="alert"
+                  className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700"
+                >
+                  {error}
+                </p>
+              ) : null}
+
               <button
                 type="submit"
-                className="w-full rounded-xl bg-emerald-500 py-3.5 font-bold text-white transition-colors hover:bg-emerald-600"
+                className="w-full rounded-xl bg-emerald-500 py-3.5 font-bold text-white transition-colors hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={submitting}
+                aria-describedby={error ? errorId : undefined}
               >
-                Create Account
+                {submitting ? 'Creating account…' : 'Create Account'}
               </button>
             </form>
 

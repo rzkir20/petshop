@@ -10,7 +10,6 @@ import {
   HandHeart,
   Settings2,
   ShoppingBag,
-  TrendingUp,
 } from 'lucide-react'
 
 export const Route = createFileRoute('/dashboard/analytics/')({
@@ -71,10 +70,34 @@ const topProducts = [
 ]
 
 const monthlyRows = [
-  { month: 'October 2023', orders: '1,240', customers: '+420', revenue: 'Rp 45.28M', margin: '24.5%' },
-  { month: 'September 2023', orders: '1,180', customers: '+385', revenue: 'Rp 42.10M', margin: '22.8%' },
-  { month: 'August 2023', orders: '950', customers: '+120', revenue: 'Rp 34.50M', margin: '18.2%' },
-  { month: 'July 2023', orders: '1,050', customers: '+210', revenue: 'Rp 38.90M', margin: '20.5%' },
+  {
+    month: 'October 2023',
+    orders: '1,240',
+    customers: '+420',
+    revenue: 'Rp 45.28M',
+    margin: '24.5%',
+  },
+  {
+    month: 'September 2023',
+    orders: '1,180',
+    customers: '+385',
+    revenue: 'Rp 42.10M',
+    margin: '22.8%',
+  },
+  {
+    month: 'August 2023',
+    orders: '950',
+    customers: '+120',
+    revenue: 'Rp 34.50M',
+    margin: '18.2%',
+  },
+  {
+    month: 'July 2023',
+    orders: '1,050',
+    customers: '+210',
+    revenue: 'Rp 38.90M',
+    margin: '20.5%',
+  },
 ]
 
 function AnalyticsPage() {
@@ -82,7 +105,9 @@ function AnalyticsPage() {
     <div className="space-y-8 p-8">
       <section className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h1 className="font-display text-3xl font-bold tracking-tight">Analytics Reports</h1>
+          <h1 className="font-display text-3xl font-bold tracking-tight">
+            Analytics Reports
+          </h1>
           <p className="mt-1 text-gray-500">
             Comprehensive performance insights for the last 12 months.
           </p>
@@ -117,12 +142,19 @@ function AnalyticsPage() {
           const Icon = item.icon
           const TrendIcon = item.up ? ArrowUpRight : ArrowDownRight
           return (
-            <article key={item.title} className="rounded-[32px] border border-emerald-50 bg-white p-6">
+            <article
+              key={item.title}
+              className="rounded-[32px] border border-emerald-50 bg-white p-6"
+            >
               <div className="mb-4 flex items-center justify-between">
-                <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.iconClass}`}>
+                <div
+                  className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.iconClass}`}
+                >
                   <Icon size={24} />
                 </div>
-                <div className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs font-bold ${item.badgeClass}`}>
+                <div
+                  className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs font-bold ${item.badgeClass}`}
+                >
                   <TrendIcon size={14} />
                   <span>{item.delta}</span>
                 </div>
@@ -137,7 +169,9 @@ function AnalyticsPage() {
       <section className="rounded-[40px] border border-emerald-50 bg-white p-8 shadow-sm">
         <div className="mb-10 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="font-display text-xl font-bold">Monthly Sales Performance</h3>
+            <h3 className="font-display text-xl font-bold">
+              Monthly Sales Performance
+            </h3>
             <p className="text-sm text-gray-400">
               Revenue growth breakdown across the fiscal year
             </p>
@@ -152,10 +186,35 @@ function AnalyticsPage() {
         </div>
 
         <div className="relative h-[400px] w-full">
-          <svg className="h-full w-full" viewBox="0 0 1200 400" preserveAspectRatio="none">
-            <line x1="0" y1="100" x2="1200" y2="100" stroke="#f3f4f6" strokeWidth="1" />
-            <line x1="0" y1="200" x2="1200" y2="200" stroke="#f3f4f6" strokeWidth="1" />
-            <line x1="0" y1="300" x2="1200" y2="300" stroke="#f3f4f6" strokeWidth="1" />
+          <svg
+            className="h-full w-full"
+            viewBox="0 0 1200 400"
+            preserveAspectRatio="none"
+          >
+            <line
+              x1="0"
+              y1="100"
+              x2="1200"
+              y2="100"
+              stroke="#f3f4f6"
+              strokeWidth="1"
+            />
+            <line
+              x1="0"
+              y1="200"
+              x2="1200"
+              y2="200"
+              stroke="#f3f4f6"
+              strokeWidth="1"
+            />
+            <line
+              x1="0"
+              y1="300"
+              x2="1200"
+              y2="300"
+              stroke="#f3f4f6"
+              strokeWidth="1"
+            />
 
             <path
               d="M0,350 Q100,280 200,310 T400,220 T600,250 T800,120 T1000,160 T1200,80"
@@ -183,7 +242,20 @@ function AnalyticsPage() {
           </svg>
 
           <div className="mt-6 flex justify-between px-2 text-[10px] font-bold tracking-widest text-gray-400 uppercase">
-            {['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'].map((month) => (
+            {[
+              'Nov',
+              'Dec',
+              'Jan',
+              'Feb',
+              'Mar',
+              'Apr',
+              'May',
+              'Jun',
+              'Jul',
+              'Aug',
+              'Sep',
+              'Oct',
+            ].map((month) => (
               <span key={month}>{month}</span>
             ))}
           </div>
@@ -192,17 +264,24 @@ function AnalyticsPage() {
 
       <section className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <article className="rounded-[40px] border border-emerald-50 bg-white p-8">
-          <h3 className="font-display mb-8 text-xl font-bold">Revenue by Category</h3>
+          <h3 className="font-display mb-8 text-xl font-bold">
+            Revenue by Category
+          </h3>
           <div className="flex flex-col items-start gap-10 xl:flex-row xl:items-center">
             <div className="relative flex h-56 w-56 items-center justify-center rounded-full bg-[conic-gradient(#10b981_0%_45%,#ff6b35_45%_70%,#3b82f6_70%_85%,#f59e0b_85%_100%)]">
               <div className="flex h-32 w-32 flex-col items-center justify-center rounded-full bg-white shadow-inner">
                 <span className="text-2xl font-bold">100%</span>
-                <span className="text-[10px] text-gray-400 uppercase">Share</span>
+                <span className="text-[10px] text-gray-400 uppercase">
+                  Share
+                </span>
               </div>
             </div>
             <div className="w-full flex-1 space-y-4">
               {categories.map((item) => (
-                <div key={item.name} className="flex items-center justify-between">
+                <div
+                  key={item.name}
+                  className="flex items-center justify-between"
+                >
                   <div className="flex items-center gap-2">
                     <span className={`h-3 w-3 rounded-full ${item.color}`} />
                     <span className="text-sm font-medium">{item.name}</span>
@@ -215,7 +294,9 @@ function AnalyticsPage() {
         </article>
 
         <article className="rounded-[40px] border border-emerald-50 bg-white p-8">
-          <h3 className="font-display mb-8 text-xl font-bold">Top Performing Products</h3>
+          <h3 className="font-display mb-8 text-xl font-bold">
+            Top Performing Products
+          </h3>
           <div className="space-y-6">
             {topProducts.map((item) => (
               <div key={item.name} className="space-y-2">
@@ -224,7 +305,10 @@ function AnalyticsPage() {
                   <span className="font-bold">{item.revenue}</span>
                 </div>
                 <div className="h-3 w-full overflow-hidden rounded-full bg-emerald-50">
-                  <div className="h-full rounded-full bg-emerald-500" style={{ width: item.width }} />
+                  <div
+                    className="h-full rounded-full bg-emerald-500"
+                    style={{ width: item.width }}
+                  />
                 </div>
               </div>
             ))}
@@ -234,7 +318,9 @@ function AnalyticsPage() {
 
       <section className="overflow-hidden rounded-[40px] border border-emerald-50 bg-white pb-4 shadow-sm">
         <div className="flex items-center justify-between border-b border-gray-50 p-8">
-          <h3 className="font-display text-xl font-bold">Detailed Performance Log</h3>
+          <h3 className="font-display text-xl font-bold">
+            Detailed Performance Log
+          </h3>
           <div className="flex gap-2">
             <button
               type="button"
@@ -254,7 +340,13 @@ function AnalyticsPage() {
           <table className="w-full text-left">
             <thead className="bg-gray-50/50">
               <tr>
-                {['Month', 'Total Orders', 'New Customers', 'Revenue', 'Profit Margin'].map((heading) => (
+                {[
+                  'Month',
+                  'Total Orders',
+                  'New Customers',
+                  'Revenue',
+                  'Profit Margin',
+                ].map((heading) => (
                   <th
                     key={heading}
                     className={`px-8 py-4 text-[10px] font-bold tracking-widest text-gray-400 uppercase ${
@@ -271,19 +363,26 @@ function AnalyticsPage() {
                 const goodGrowth = row.customers !== '+120'
                 const strongMargin = row.margin !== '18.2%'
                 return (
-                  <tr key={row.month} className="transition-all hover:bg-emerald-50/20">
+                  <tr
+                    key={row.month}
+                    className="transition-all hover:bg-emerald-50/20"
+                  >
                     <td className="px-8 py-5 text-sm font-bold">{row.month}</td>
                     <td className="px-8 py-5 text-sm">{row.orders}</td>
                     <td className="px-8 py-5 text-sm">
                       <span
                         className={`rounded-lg px-2 py-1 text-xs ${
-                          goodGrowth ? 'bg-emerald-100 text-emerald-500' : 'bg-orange-100 text-[#ff6b35]'
+                          goodGrowth
+                            ? 'bg-emerald-100 text-emerald-500'
+                            : 'bg-orange-100 text-[#ff6b35]'
                         }`}
                       >
                         {row.customers}
                       </span>
                     </td>
-                    <td className="px-8 py-5 text-sm font-bold">{row.revenue}</td>
+                    <td className="px-8 py-5 text-sm font-bold">
+                      {row.revenue}
+                    </td>
                     <td
                       className={`px-8 py-5 text-right text-sm font-bold ${
                         strongMargin ? 'text-emerald-500' : 'text-gray-400'

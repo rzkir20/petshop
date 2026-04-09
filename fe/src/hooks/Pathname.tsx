@@ -9,13 +9,13 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 
 const Pathname = ({ children }: { children: React.ReactNode }) => {
-  const pathname = useLocation()
+  const { pathname } = useLocation()
 
   const isRoute =
-    pathname.pathname.includes('/cart') ||
-    pathname.pathname.includes('/signin') ||
-    pathname.pathname.includes('/signup') ||
-    pathname.pathname.includes('/dashboard') ||
+    pathname.includes('/cart') ||
+    pathname.includes('/signin') ||
+    pathname.includes('/signup') ||
+    pathname.includes('/dashboard') ||
     false
 
   return (

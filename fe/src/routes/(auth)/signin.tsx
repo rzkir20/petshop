@@ -1,4 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
+import {
+  Navigate,
+  createFileRoute,
+  redirect,
+  useNavigate,
+} from '@tanstack/react-router'
 
 import {
   CheckCircle2,
@@ -7,17 +12,62 @@ import {
   PawPrint,
   ShieldCheck,
 } from 'lucide-react'
+import React, { useId, useState } from 'react'
+
+import { useAuth } from '../../context/AuthContext'
+import { getSession } from '../../services/auth.service'
 
 export const Route = createFileRoute('/(auth)/signin')({
+  beforeLoad: async () => {
+    try {
+      await getSession()
+    } catch {
+      // No active session, stay on auth page.
+      return
+    }
+    throw redirect({ to: '/dashboard' })
+  },
   component: SignInPage,
 })
 
 function SignInPage() {
+  const navigate = useNavigate()
+  const { signin, status } = useAuth()
+  const errorId = useId()
+  const [form, setForm] = useState({
+    email: '',
+    password: '',
+    remember: false,
+  })
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  if (status === 'loading') return null
+  if (status === 'authenticated') return <Navigate to="/dashboard" />
+
   const perks = [
     'Track your orders in real time',
     'Save favorites and repeat orders faster',
     'Get personalized pet care recommendations',
   ]
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setError(null)
+    setSubmitting(true)
+
+    try {
+      await signin({
+        email: form.email,
+        password: form.password,
+      })
+      await navigate({ to: '/dashboard' })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Signin failed')
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
@@ -66,7 +116,7 @@ function SignInPage() {
               Use your email and password to access your account.
             </p>
 
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={onSubmit}>
               <div className="space-y-2">
                 <label
                   htmlFor="email"
@@ -81,6 +131,12 @@ function SignInPage() {
                     type="email"
                     placeholder="you@example.com"
                     className="w-full border-none bg-transparent px-3 py-3.5 outline-none"
+                    value={form.email}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, email: e.target.value }))
+                    }
+                    autoComplete="email"
+                    required
                   />
                 </div>
               </div>
@@ -99,6 +155,12 @@ function SignInPage() {
                     type="password"
                     placeholder="Enter your password"
                     className="w-full border-none bg-transparent px-3 py-3.5 outline-none"
+                    value={form.password}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, password: e.target.value }))
+                    }
+                    autoComplete="current-password"
+                    required
                   />
                 </div>
               </div>
@@ -108,6 +170,10 @@ function SignInPage() {
                   <input
                     type="checkbox"
                     className="h-4 w-4 rounded border-slate-300 text-emerald-500"
+                    checked={form.remember}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, remember: e.target.checked }))
+                    }
                   />
                   Remember me
                 </label>
@@ -119,11 +185,23 @@ function SignInPage() {
                 </a>
               </div>
 
+              {error ? (
+                <p
+                  id={errorId}
+                  role="alert"
+                  className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700"
+                >
+                  {error}
+                </p>
+              ) : null}
+
               <button
                 type="submit"
-                className="w-full rounded-xl bg-emerald-500 py-3.5 font-bold text-white transition-colors hover:bg-emerald-600"
+                className="w-full rounded-xl bg-emerald-500 py-3.5 font-bold text-white transition-colors hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={submitting}
+                aria-describedby={error ? errorId : undefined}
               >
-                Sign In
+                {submitting ? 'Signing in…' : 'Sign In'}
               </button>
             </form>
 

@@ -8,11 +8,8 @@ export async function requestJson<T>(
   init: RequestInit = {},
 ): Promise<T> {
   const base = API_BASE_URL
-  if (!base) {
-    throw new Error('VITE_API_BASE_URL is not set')
-  }
-  const baseTrim = base.replace(/\/$/, '')
-  const url = `${baseTrim}${path.startsWith('/') ? path : `/${path}`}`
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  const url = `${base}${normalizedPath}`
   const headers = new Headers(init.headers)
   headers.set('Accept', 'application/json')
   const isFormDataBody =

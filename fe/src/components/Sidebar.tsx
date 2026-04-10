@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  ChevronDown,
   Crown,
   HelpCircle,
   LayoutDashboard,
@@ -17,14 +18,46 @@ type SidebarItem = {
   icon: React.ComponentType<{ size?: number; className?: string }>
   href?: string
   to?: string
+  subItems?: Array<{
+    id: string
+    label: string
+    to: string
+  }>
 }
 
 const mainMenuItems: SidebarItem[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard' },
-  { id: 'analytics', label: 'Analytics', icon: BarChart3, to: '/dashboard/analytics' },
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    icon: LayoutDashboard,
+    to: '/dashboard',
+  },
+  {
+    id: 'analytics',
+    label: 'Analytics',
+    icon: BarChart3,
+    to: '/dashboard/analytics',
+  },
   { id: 'orders', label: 'Orders', icon: ShoppingBag, to: '/dashboard/orders' },
-  { id: 'inventory', label: 'Inventory', icon: Package, to: '/dashboard/inventory' },
-  { id: 'customers', label: 'Customers', icon: Users2, to: '/dashboard/costumers' },
+  {
+    id: 'inventory',
+    label: 'Inventory',
+    icon: Package,
+    subItems: [
+      { id: 'inventory-post', label: 'Post', to: '/dashboard/inventory' },
+      {
+        id: 'inventory-category',
+        label: 'Category',
+        to: '/dashboard/inventory/categories',
+      },
+    ],
+  },
+  {
+    id: 'customers',
+    label: 'Customers',
+    icon: Users2,
+    to: '/dashboard/costumers',
+  },
 ]
 
 const accountItems: SidebarItem[] = [
@@ -60,11 +93,50 @@ export default function Sidebar({
         {mainMenuItems.map((item) => {
           const Icon = item.icon
           const isActive = activeItem === item.id
+          const isSubItemActive =
+            item.subItems?.some((subItem) => subItem.id === activeItem) ?? false
           const className = `flex items-center gap-3 rounded-[20px] px-4 py-3.5 transition-all duration-300 ${
-            isActive
+            isActive || isSubItemActive
               ? 'bg-emerald-500 text-white'
               : 'text-gray-500 hover:bg-emerald-50 hover:text-emerald-500'
           }`
+
+          if (item.subItems?.length) {
+            return (
+              <details
+                key={item.id}
+                className="group"
+                open={isActive || isSubItemActive}
+              >
+                <summary className={`${className} list-none cursor-pointer`}>
+                  <Icon size={20} />
+                  <span className="font-medium">{item.label}</span>
+                  <ChevronDown
+                    size={16}
+                    className="ml-auto transition-transform duration-300 group-open:rotate-180"
+                  />
+                </summary>
+                <div className="mt-1 space-y-1 pl-10">
+                  {item.subItems.map((subItem) => {
+                    const isSubActive = activeItem === subItem.id
+                    return (
+                      <Link
+                        key={subItem.id}
+                        to={subItem.to}
+                        className={`flex items-center rounded-xl px-3 py-2 text-sm font-medium transition-all duration-300 ${
+                          isSubActive
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'text-gray-500 hover:bg-emerald-50 hover:text-emerald-500'
+                        }`}
+                      >
+                        {subItem.label}
+                      </Link>
+                    )
+                  })}
+                </div>
+              </details>
+            )
+          }
 
           if (item.to) {
             return (
@@ -81,11 +153,7 @@ export default function Sidebar({
           }
 
           return (
-            <a
-              key={item.id}
-              href={item.href}
-              className={className}
-            >
+            <a key={item.id} href={item.href} className={className}>
               <Icon size={20} />
               <span className="font-medium">{item.label}</span>
               {item.id === 'orders' && orderCount > 0 ? (

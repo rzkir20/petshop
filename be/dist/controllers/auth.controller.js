@@ -37,7 +37,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.signup = signup;
+exports.signin = signin;
 exports.signout = signout;
+exports.session = session;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const Accounts = __importStar(require("../models/Accounts"));
 const password_1 = require("../utils/password");
@@ -94,7 +96,55 @@ async function signup(req, res) {
         return res.status(500).json({ message: "Internal server error" });
     }
 }
+async function signin(req, res) {
+    try {
+        const { email, password } = (req.body || {});
+        const account = await Accounts.findByEmail(String(email || ""));
+        if (!account || !(0, password_1.verifyPassword)(String(password || ""), account.password)) {
+            return res.status(401).json({ message: "Invalid email or password" });
+        }
+        const publicUser = Accounts.toPublic(account);
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+            return res.status(500).json({ message: "JWT_SECRET is not configured" });
+        }
+        const token = jsonwebtoken_1.default.sign({
+            sub: publicUser?._id,
+            email: publicUser?.email,
+            name: publicUser?.name,
+        }, secret, { expiresIn: "7d" });
+        res.cookie("session", token, getJwtCookieOptions());
+        return res.status(200).json({
+            message: "Signin successful",
+            user: publicUser,
+        });
+    }
+    catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
 function signout(_req, res) {
     res.clearCookie("session", getJwtCookieOptions());
     return res.status(200).json({ message: "Signout successful" });
+}
+async function session(req, res) {
+    try {
+        const token = req.cookies?.session;
+        const secret = process.env.JWT_SECRET;
+        if (!token || !secret) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        const payload = jsonwebtoken_1.default.verify(token, secret);
+        return res.status(200).json({
+            user: {
+                _id: String(payload.sub || ""),
+                email: String(payload.email || ""),
+                name: String(payload.name || ""),
+            },
+        });
+    }
+    catch (_err) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
 }

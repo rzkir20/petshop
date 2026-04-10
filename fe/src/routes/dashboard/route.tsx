@@ -35,11 +35,13 @@ function DashboardLayout() {
     ? 'analytics'
     : pathname.startsWith('/dashboard/orders')
       ? 'orders'
-      : pathname.startsWith('/dashboard/inventory')
-        ? 'inventory'
-        : pathname.startsWith('/dashboard/costumers')
-          ? 'customers'
-          : 'dashboard'
+      : pathname.startsWith('/dashboard/inventory/categories')
+        ? 'inventory-category'
+        : pathname.startsWith('/dashboard/inventory')
+          ? 'inventory-post'
+          : pathname.startsWith('/dashboard/costumers')
+            ? 'customers'
+            : 'dashboard'
 
   return (
     <div className="min-h-screen bg-[#f3faf5] text-[#173a40]">

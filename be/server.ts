@@ -6,6 +6,8 @@ import express, { Request, Response } from "express";
 
 import authRoutes from "./routes/auth.routes";
 
+import categoriesRoutes from "./routes/categories.routes";
+
 import { connectToDatabase as connectDb } from "./utils/mongodb";
 
 const app = express();
@@ -26,6 +28,8 @@ app.get("/", (_req: Request, res: Response) => {
 });
 
 app.use("/auth", authRoutes);
+
+app.use("/categories", categoriesRoutes);
 
 async function bootstrap() {
   await connectDb();

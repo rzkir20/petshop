@@ -4,6 +4,9 @@ type FieldRule = {
   required?: boolean;
   minLen?: number;
   email?: boolean;
+  pattern?: RegExp;
+  patternMessage?: string;
+  oneOf?: string[];
 };
 
 type BodySchema = Record<string, FieldRule>;
@@ -40,6 +43,24 @@ export function validateBody(schema: BodySchema) {
 
       if (rules.email && !isEmail(value)) {
         return res.status(400).json({ message: `Valid ${field} is required` });
+      }
+
+      if (
+        rules.pattern != null &&
+        String(value).length > 0 &&
+        !rules.pattern.test(String(value))
+      ) {
+        return res.status(400).json({
+          message: rules.patternMessage || `${field} format is invalid`,
+        });
+      }
+
+      if (rules.oneOf != null && rules.oneOf.length > 0) {
+        if (!rules.oneOf.includes(String(value))) {
+          return res.status(400).json({
+            message: `${field} must be one of: ${rules.oneOf.join(", ")}`,
+          });
+        }
       }
     }
 

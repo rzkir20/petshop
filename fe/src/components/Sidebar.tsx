@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  BookText,
   ChevronDown,
   Crown,
   HelpCircle,
@@ -53,6 +54,19 @@ const mainMenuItems: SidebarItem[] = [
     ],
   },
   {
+    id: 'blog',
+    label: 'Blog',
+    icon: BookText,
+    subItems: [
+      { id: 'blog-post', label: 'Post', to: '/dashboard/blog' },
+      {
+        id: 'blog-category',
+        label: 'Category',
+        to: '/dashboard/blog/categories',
+      },
+    ],
+  },
+  {
     id: 'customers',
     label: 'Customers',
     icon: Users2,
@@ -69,13 +83,19 @@ export default function Sidebar({
   activeItem = 'dashboard',
   orderCount = 12,
   showUpgradeCard = true,
+  className = '',
+  onNavigate,
 }: {
   activeItem?: string
   orderCount?: number
   showUpgradeCard?: boolean
+  className?: string
+  onNavigate?: () => void
 }) {
   return (
-    <aside className="fixed z-30 flex h-full w-72 flex-col border-r border-emerald-100 bg-white">
+    <aside
+      className={`fixed inset-y-0 left-0 z-40 flex h-full w-72 flex-col border-r border-emerald-100 bg-white transition-transform duration-300 xl:translate-x-0 ${className}`}
+    >
       <div className="flex items-center gap-3 p-8">
         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-[0_4px_14px_0_rgba(16,185,129,0.15)]">
           <PawPrint size={20} />
@@ -95,7 +115,7 @@ export default function Sidebar({
           const isActive = activeItem === item.id
           const isSubItemActive =
             item.subItems?.some((subItem) => subItem.id === activeItem) ?? false
-          const className = `flex items-center gap-3 rounded-[20px] px-4 py-3.5 transition-all duration-300 ${
+          const itemClassName = `flex items-center gap-3 rounded-[20px] px-4 py-3.5 transition-all duration-300 ${
             isActive || isSubItemActive
               ? 'bg-emerald-500 text-white'
               : 'text-gray-500 hover:bg-emerald-50 hover:text-emerald-500'
@@ -108,7 +128,9 @@ export default function Sidebar({
                 className="group"
                 open={isActive || isSubItemActive}
               >
-                <summary className={`${className} list-none cursor-pointer`}>
+                <summary
+                  className={`${itemClassName} list-none cursor-pointer`}
+                >
                   <Icon size={20} />
                   <span className="font-medium">{item.label}</span>
                   <ChevronDown
@@ -123,6 +145,7 @@ export default function Sidebar({
                       <Link
                         key={subItem.id}
                         to={subItem.to}
+                        onClick={onNavigate}
                         className={`flex items-center rounded-xl px-3 py-2 text-sm font-medium transition-all duration-300 ${
                           isSubActive
                             ? 'bg-emerald-100 text-emerald-700'
@@ -140,7 +163,12 @@ export default function Sidebar({
 
           if (item.to) {
             return (
-              <Link key={item.id} to={item.to} className={className}>
+              <Link
+                key={item.id}
+                to={item.to}
+                onClick={onNavigate}
+                className={itemClassName}
+              >
                 <Icon size={20} />
                 <span className="font-medium">{item.label}</span>
                 {item.id === 'orders' && orderCount > 0 ? (
@@ -153,7 +181,12 @@ export default function Sidebar({
           }
 
           return (
-            <a key={item.id} href={item.href} className={className}>
+            <a
+              key={item.id}
+              href={item.href}
+              onClick={onNavigate}
+              className={itemClassName}
+            >
               <Icon size={20} />
               <span className="font-medium">{item.label}</span>
               {item.id === 'orders' && orderCount > 0 ? (

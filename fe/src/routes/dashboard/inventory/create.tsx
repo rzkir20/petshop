@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate  } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useId } from 'react'
 
 import { Input } from '#/components/ui/input'
@@ -39,7 +39,6 @@ function RouteComponent() {
         </header>
 
         <form
-          className="grid grid-cols-1 gap-4 md:grid-cols-2"
           onSubmit={(e) => {
             e.preventDefault()
             create.mutate(form.createInput, {
@@ -48,6 +47,7 @@ function RouteComponent() {
               },
             })
           }}
+          className="flex flex-col space-y-6"
         >
           {create.isError ? (
             <div className="md:col-span-2 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -57,119 +57,169 @@ function RouteComponent() {
             </div>
           ) : null}
 
-          <div className="md:col-span-2">
-            <Label htmlFor="product-title">Product title</Label>
-            <Input
-              id="product-title"
-              required
-              value={form.title}
-              onChange={(e) => form.setTitle(e.target.value)}
-              placeholder="Contoh: Premium Salmon Mix 5kg"
-            />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="product-title">Product title</Label>
+              <Input
+                id="product-title"
+                required
+                value={form.title}
+                onChange={(e) => form.setTitle(e.target.value)}
+                placeholder="Contoh: Premium Salmon Mix 5kg"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="product-slug">Slug</Label>
+              <Input id="product-slug" value={form.slug} readOnly />
+            </div>
           </div>
 
-          <div>
-            <Label htmlFor="product-slug">Slug</Label>
-            <Input id="product-slug" value={form.slug} readOnly />
-          </div>
-
-          <div>
-            <Label htmlFor="product-expired-at">Masa kadaluarsa</Label>
-            <Input
-              id="product-expired-at"
-              type="date"
-              required
-              value={form.expiredAt}
-              onChange={(e) => form.setExpiredAt(e.target.value)}
-              onClick={(e) => {
-                const input = e.currentTarget as HTMLInputElement & {
-                  showPicker?: () => void
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="product-category">Category</Label>
+              <Select
+                id="product-category"
+                value={form.category}
+                disabled={
+                  form.categoriesQuery.isPending ||
+                  form.categoryOptions.length === 0
                 }
-                if (typeof input.showPicker === 'function') {
-                  input.showPicker()
+                onChange={(e) => form.setCategory(e.target.value)}
+              >
+                {form.categoryOptions.length === 0 ? (
+                  <option value="">No active category available</option>
+                ) : null}
+                {form.categoryOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </Select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="product-is-best-seller">Best seller</Label>
+              <Select
+                id="product-is-best-seller"
+                value={form.isBestSeller ? 'true' : 'false'}
+                onChange={(e) =>
+                  form.setIsBestSeller(e.target.value === 'true')
                 }
-              }}
-            />
+              >
+                <option value="false">False</option>
+                <option value="true">True</option>
+              </Select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="product-status">Stock status</Label>
+              <Select
+                id="product-status"
+                value={form.status}
+                onChange={(e) =>
+                  form.setStatus(e.target.value as typeof form.status)
+                }
+              >
+                <option value="in-stock">In Stock</option>
+                <option value="low-stock">Low Stock</option>
+                <option value="out-of-stock">Out of Stock</option>
+              </Select>
+            </div>
           </div>
 
-          <div>
-            <Label htmlFor="product-flavor">Flavor</Label>
-            <Input
-              id="product-flavor"
-              required
-              value={form.flavor}
-              onChange={(e) => form.setFlavor(e.target.value)}
-              placeholder="Chicken"
-            />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="product-price">Price</Label>
+              <Input
+                id="product-price"
+                type="number"
+                min={0}
+                required
+                value={String(form.price)}
+                onChange={(e) => form.setPrice(Number(e.target.value))}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="product-reorder">Reorder point</Label>
+              <Input
+                id="product-reorder"
+                required
+                value={form.reorder}
+                onChange={(e) => form.setReorder(e.target.value)}
+                placeholder="Contoh: 25 units"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="product-weight">Weight</Label>
+              <Input
+                id="product-weight"
+                required
+                value={form.weight}
+                onChange={(e) => form.setWeight(e.target.value)}
+                placeholder="1kg"
+              />
+            </div>
           </div>
 
-          <div>
-            <Label htmlFor="product-weight">Weight</Label>
-            <Input
-              id="product-weight"
-              required
-              value={form.weight}
-              onChange={(e) => form.setWeight(e.target.value)}
-              placeholder="1kg"
-            />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="product-expired-at">Masa kadaluarsa</Label>
+              <Input
+                id="product-expired-at"
+                type="date"
+                required
+                value={form.expiredAt}
+                onChange={(e) => form.setExpiredAt(e.target.value)}
+                onClick={(e) => {
+                  const input = e.currentTarget as HTMLInputElement & {
+                    showPicker?: () => void
+                  }
+                  if (typeof input.showPicker === 'function') {
+                    input.showPicker()
+                  }
+                }}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="product-flavor">Flavor</Label>
+              <Input
+                id="product-flavor"
+                required
+                value={form.flavor}
+                onChange={(e) => form.setFlavor(e.target.value)}
+                placeholder="Chicken"
+              />
+            </div>
           </div>
 
-          <div>
-            <Label htmlFor="product-category">Category</Label>
-            <Select
-              id="product-category"
-              value={form.category}
-              disabled={form.categoriesQuery.isPending || form.categoryOptions.length === 0}
-              onChange={(e) => form.setCategory(e.target.value)}
-            >
-              {form.categoryOptions.length === 0 ? (
-                <option value="">No active category available</option>
-              ) : null}
-              {form.categoryOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </Select>
-          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="product-stock-current">Stock current</Label>
+              <Input
+                id="product-stock-current"
+                type="number"
+                min={0}
+                required
+                value={String(form.stockCurrent)}
+                onChange={(e) => form.setStockCurrent(Number(e.target.value))}
+              />
+            </div>
 
-          <div>
-            <Label htmlFor="product-status">Stock status</Label>
-            <Select
-              id="product-status"
-              value={form.status}
-              onChange={(e) =>
-                form.setStatus(e.target.value as typeof form.status)
-              }
-            >
-              <option value="in-stock">In Stock</option>
-              <option value="low-stock">Low Stock</option>
-              <option value="out-of-stock">Out of Stock</option>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="product-price">Price</Label>
-            <Input
-              id="product-price"
-              type="number"
-              min={0}
-              required
-              value={String(form.price)}
-              onChange={(e) => form.setPrice(Number(e.target.value))}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="product-is-best-seller">Best seller</Label>
-            <Select
-              id="product-is-best-seller"
-              value={form.isBestSeller ? 'true' : 'false'}
-              onChange={(e) => form.setIsBestSeller(e.target.value === 'true')}
-            >
-              <option value="false">False</option>
-              <option value="true">True</option>
-            </Select>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="product-stock-max">Stock max</Label>
+              <Input
+                id="product-stock-max"
+                type="number"
+                min={0}
+                required
+                value={String(form.stockMax)}
+                onChange={(e) => form.setStockMax(Number(e.target.value))}
+              />
+            </div>
           </div>
 
           <div className="md:col-span-2">
@@ -178,41 +228,6 @@ function RouteComponent() {
               value={form.content}
               onChange={form.setContent}
               placeholder="Deskripsi produk..."
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="product-stock-current">Stock current</Label>
-            <Input
-              id="product-stock-current"
-              type="number"
-              min={0}
-              required
-              value={String(form.stockCurrent)}
-              onChange={(e) => form.setStockCurrent(Number(e.target.value))}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="product-stock-max">Stock max</Label>
-            <Input
-              id="product-stock-max"
-              type="number"
-              min={0}
-              required
-              value={String(form.stockMax)}
-              onChange={(e) => form.setStockMax(Number(e.target.value))}
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <Label htmlFor="product-reorder">Reorder point</Label>
-            <Input
-              id="product-reorder"
-              required
-              value={form.reorder}
-              onChange={(e) => form.setReorder(e.target.value)}
-              placeholder="Contoh: 25 units"
             />
           </div>
 
@@ -280,7 +295,9 @@ function RouteComponent() {
                     <button
                       type="button"
                       onClick={() =>
-                        form.setImageFiles((prev) => prev.filter((_, i) => i !== index))
+                        form.setImageFiles((prev) =>
+                          prev.filter((_, i) => i !== index),
+                        )
                       }
                       className="absolute top-1 right-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-white"
                     >

@@ -20,6 +20,7 @@ const categoryFilters = [
 
 const products = [
   {
+    slug: 'premium-grain-free-salmon-dog-food',
     title: 'Premium Grain-Free Salmon Dog Food',
     price: '$45.99',
     category: 'Dogs • 12kg Pack',
@@ -29,6 +30,7 @@ const products = [
     badge: 'Best Seller',
   },
   {
+    slug: 'smart-interactive-laser-toy',
     title: 'Smart Interactive Laser Toy',
     price: '$24.50',
     category: 'Cats • Toys',
@@ -38,6 +40,7 @@ const products = [
     badge: '',
   },
   {
+    slug: 'orthopedic-memory-foam-bed',
     title: 'Orthopedic Memory Foam Bed',
     price: '$89.00',
     category: 'Dogs/Cats • Accessories',
@@ -47,6 +50,7 @@ const products = [
     badge: 'New',
   },
   {
+    slug: 'reflective-heavy-duty-leash',
     title: 'Reflective Heavy-Duty Leash',
     price: '$18.99',
     category: 'Dogs • Accessories',
@@ -56,6 +60,7 @@ const products = [
     badge: '',
   },
   {
+    slug: 'modern-parakeet-flight-cage',
     title: 'Modern Parakeet Flight Cage',
     price: '$125.00',
     category: 'Birds • Cages',
@@ -65,6 +70,7 @@ const products = [
     badge: '',
   },
   {
+    slug: '20-gallon-glass-starter-kit',
     title: '20-Gallon Glass Starter Kit',
     price: '$95.00',
     category: 'Fish • Aquariums',
@@ -228,11 +234,13 @@ function RouteComponent() {
                   className="product-card group rounded-[2.5rem] border border-slate-100 bg-white p-4 transition-all hover:shadow-2xl hover:shadow-emerald-100/50"
                 >
                   <div className="relative aspect-square overflow-hidden rounded-4xl bg-slate-100">
-                    <img
-                      src={product.image}
-                      alt={product.title}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
+                    <a href={`/shop/${product.slug}`}>
+                      <img
+                        src={product.image}
+                        alt={product.title}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                    </a>
                     {product.badge ? (
                       <div className="absolute top-4 left-4 rounded-full bg-orange-500 px-3 py-1 text-xs font-bold text-white">
                         {product.badge}
@@ -251,9 +259,12 @@ function RouteComponent() {
 
                   <div className="mt-6 px-3">
                     <div className="mb-2 flex items-start justify-between gap-3">
-                      <h3 className="text-xl leading-tight font-bold text-slate-800 transition-colors group-hover:text-emerald-600">
+                      <a
+                        href={`/shop/${product.slug}`}
+                        className="text-xl leading-tight font-bold text-slate-800 transition-colors group-hover:text-emerald-600"
+                      >
                         {product.title}
-                      </h3>
+                      </a>
                       <span className="text-xl font-bold whitespace-nowrap text-emerald-600">
                         {product.price}
                       </span>

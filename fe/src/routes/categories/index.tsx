@@ -2,7 +2,8 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { ArrowRight, Bird, Cat, Dog, Fish } from 'lucide-react'
 
-export const Route = createFileRoute('/categories')({
+const createCategoriesRoute = createFileRoute as any
+export const Route = createCategoriesRoute('/categories/')({
   component: RouteComponent,
 })
 
@@ -15,7 +16,7 @@ const categories = [
       'From premium kibble to chew-proof toys and cozy memory foam beds, find everything your loyal companion needs to thrive.',
     image:
       'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=600&q=80',
-    href: '/shop',
+    href: '/categories/dogs',
     cardClass: 'bg-orange-50 border-orange-100/50',
     chipClass: 'text-orange-600',
     textClass: 'text-orange-600',
@@ -29,7 +30,7 @@ const categories = [
       "Discover elegant scratchers, grain-free nutrition, and interactive toys designed to satisfy your cat's natural instincts.",
     image:
       'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=600&q=80',
-    href: '/shop',
+    href: '/categories/cats',
     cardClass: 'bg-emerald-50 border-emerald-100/50',
     chipClass: 'text-emerald-600',
     textClass: 'text-emerald-600',
@@ -43,7 +44,7 @@ const categories = [
       'Create a vibrant underwater world with our high-tech filtration systems, decorative plants, and premium aquatic nutrition.',
     image:
       'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=600&q=80',
-    href: '/shop',
+    href: '/categories/fish',
     cardClass: 'bg-blue-50 border-blue-100/50',
     chipClass: 'text-blue-600',
     textClass: 'text-blue-600',
@@ -57,7 +58,7 @@ const categories = [
       'Keep your feathered friends singing with organic seed mixes, spacious flight cages, and interactive enrichment toys.',
     image:
       'https://images.unsplash.com/photo-1552728089-57bdde30fc3a?auto=format&fit=crop&w=600&q=80',
-    href: '/shop',
+    href: '/categories/birds',
     cardClass: 'bg-yellow-50 border-yellow-100/50',
     chipClass: 'text-yellow-600',
     textClass: 'text-yellow-600',

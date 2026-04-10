@@ -15,27 +15,32 @@ import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as DealsRouteImport } from './routes/deals'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopIndexRouteImport } from './routes/shop/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as CategoriesIndexRouteImport } from './routes/categories/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
+import { Route as ShopSlugRouteImport } from './routes/shop/$slug'
 import { Route as RulesTermsRouteImport } from './routes/rules/terms'
 import { Route as RulesPrivacyPolicyRouteImport } from './routes/rules/privacy-policy'
 import { Route as RulesCookiesRouteImport } from './routes/rules/cookies'
+import { Route as CategoriesSlugRouteImport } from './routes/categories/$slug'
+import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as authSignupRouteImport } from './routes/(auth)/signup'
 import { Route as authSigninRouteImport } from './routes/(auth)/signin'
 import { Route as DashboardOrdersIndexRouteImport } from './routes/dashboard/orders/index'
 import { Route as DashboardInventoryIndexRouteImport } from './routes/dashboard/inventory/index'
 import { Route as DashboardCostumersIndexRouteImport } from './routes/dashboard/costumers/index'
+import { Route as DashboardBlogIndexRouteImport } from './routes/dashboard/blog/index'
 import { Route as DashboardAnalyticsIndexRouteImport } from './routes/dashboard/analytics/index'
 import { Route as DashboardInventoryCreateRouteImport } from './routes/dashboard/inventory/create'
 import { Route as DashboardInventoryCategoriesRouteImport } from './routes/dashboard/inventory/categories'
 import { Route as DashboardInventoryIdRouteImport } from './routes/dashboard/inventory/$id'
 import { Route as DashboardCostumersCostumersIdRouteImport } from './routes/dashboard/costumers/$costumersId'
+import { Route as DashboardBlogCategoriesRouteImport } from './routes/dashboard/blog/categories'
 
 const ShippingRoute = ShippingRouteImport.update({
   id: '/shipping',
@@ -65,11 +70,6 @@ const DealsRoute = DealsRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CategoriesRoute = CategoriesRouteImport.update({
-  id: '/categories',
-  path: '/categories',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CartRoute = CartRouteImport.update({
@@ -102,9 +102,19 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const CategoriesIndexRoute = CategoriesIndexRouteImport.update({
+  id: '/categories/',
+  path: '/categories/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopSlugRoute = ShopSlugRouteImport.update({
+  id: '/shop/$slug',
+  path: '/shop/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RulesTermsRoute = RulesTermsRouteImport.update({
@@ -120,6 +130,16 @@ const RulesPrivacyPolicyRoute = RulesPrivacyPolicyRouteImport.update({
 const RulesCookiesRoute = RulesCookiesRouteImport.update({
   id: '/rules/cookies',
   path: '/rules/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
+  id: '/categories/$slug',
+  path: '/categories/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const authSignupRoute = authSignupRouteImport.update({
@@ -145,6 +165,11 @@ const DashboardInventoryIndexRoute = DashboardInventoryIndexRouteImport.update({
 const DashboardCostumersIndexRoute = DashboardCostumersIndexRouteImport.update({
   id: '/costumers/',
   path: '/costumers/',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardBlogIndexRoute = DashboardBlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardAnalyticsIndexRoute = DashboardAnalyticsIndexRouteImport.update({
@@ -175,13 +200,17 @@ const DashboardCostumersCostumersIdRoute =
     path: '/costumers/$costumersId',
     getParentRoute: () => DashboardRouteRoute,
   } as any)
+const DashboardBlogCategoriesRoute = DashboardBlogCategoriesRouteImport.update({
+  id: '/blog/categories',
+  path: '/blog/categories',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/cart': typeof CartRoute
-  '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/deals': typeof DealsRoute
   '/help': typeof HelpRoute
@@ -190,17 +219,23 @@ export interface FileRoutesByFullPath {
   '/shipping': typeof ShippingRoute
   '/signin': typeof authSigninRoute
   '/signup': typeof authSignupRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/categories/$slug': typeof CategoriesSlugRoute
   '/rules/cookies': typeof RulesCookiesRoute
   '/rules/privacy-policy': typeof RulesPrivacyPolicyRoute
   '/rules/terms': typeof RulesTermsRoute
+  '/shop/$slug': typeof ShopSlugRoute
   '/blog/': typeof BlogIndexRoute
+  '/categories/': typeof CategoriesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/shop/': typeof ShopIndexRoute
+  '/dashboard/blog/categories': typeof DashboardBlogCategoriesRoute
   '/dashboard/costumers/$costumersId': typeof DashboardCostumersCostumersIdRoute
   '/dashboard/inventory/$id': typeof DashboardInventoryIdRoute
   '/dashboard/inventory/categories': typeof DashboardInventoryCategoriesRoute
   '/dashboard/inventory/create': typeof DashboardInventoryCreateRoute
   '/dashboard/analytics/': typeof DashboardAnalyticsIndexRoute
+  '/dashboard/blog/': typeof DashboardBlogIndexRoute
   '/dashboard/costumers/': typeof DashboardCostumersIndexRoute
   '/dashboard/inventory/': typeof DashboardInventoryIndexRoute
   '/dashboard/orders/': typeof DashboardOrdersIndexRoute
@@ -209,7 +244,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/cart': typeof CartRoute
-  '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/deals': typeof DealsRoute
   '/help': typeof HelpRoute
@@ -218,17 +252,23 @@ export interface FileRoutesByTo {
   '/shipping': typeof ShippingRoute
   '/signin': typeof authSigninRoute
   '/signup': typeof authSignupRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/categories/$slug': typeof CategoriesSlugRoute
   '/rules/cookies': typeof RulesCookiesRoute
   '/rules/privacy-policy': typeof RulesPrivacyPolicyRoute
   '/rules/terms': typeof RulesTermsRoute
+  '/shop/$slug': typeof ShopSlugRoute
   '/blog': typeof BlogIndexRoute
+  '/categories': typeof CategoriesIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/shop': typeof ShopIndexRoute
+  '/dashboard/blog/categories': typeof DashboardBlogCategoriesRoute
   '/dashboard/costumers/$costumersId': typeof DashboardCostumersCostumersIdRoute
   '/dashboard/inventory/$id': typeof DashboardInventoryIdRoute
   '/dashboard/inventory/categories': typeof DashboardInventoryCategoriesRoute
   '/dashboard/inventory/create': typeof DashboardInventoryCreateRoute
   '/dashboard/analytics': typeof DashboardAnalyticsIndexRoute
+  '/dashboard/blog': typeof DashboardBlogIndexRoute
   '/dashboard/costumers': typeof DashboardCostumersIndexRoute
   '/dashboard/inventory': typeof DashboardInventoryIndexRoute
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
@@ -239,7 +279,6 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/cart': typeof CartRoute
-  '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/deals': typeof DealsRoute
   '/help': typeof HelpRoute
@@ -248,17 +287,23 @@ export interface FileRoutesById {
   '/shipping': typeof ShippingRoute
   '/(auth)/signin': typeof authSigninRoute
   '/(auth)/signup': typeof authSignupRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/categories/$slug': typeof CategoriesSlugRoute
   '/rules/cookies': typeof RulesCookiesRoute
   '/rules/privacy-policy': typeof RulesPrivacyPolicyRoute
   '/rules/terms': typeof RulesTermsRoute
+  '/shop/$slug': typeof ShopSlugRoute
   '/blog/': typeof BlogIndexRoute
+  '/categories/': typeof CategoriesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/shop/': typeof ShopIndexRoute
+  '/dashboard/blog/categories': typeof DashboardBlogCategoriesRoute
   '/dashboard/costumers/$costumersId': typeof DashboardCostumersCostumersIdRoute
   '/dashboard/inventory/$id': typeof DashboardInventoryIdRoute
   '/dashboard/inventory/categories': typeof DashboardInventoryCategoriesRoute
   '/dashboard/inventory/create': typeof DashboardInventoryCreateRoute
   '/dashboard/analytics/': typeof DashboardAnalyticsIndexRoute
+  '/dashboard/blog/': typeof DashboardBlogIndexRoute
   '/dashboard/costumers/': typeof DashboardCostumersIndexRoute
   '/dashboard/inventory/': typeof DashboardInventoryIndexRoute
   '/dashboard/orders/': typeof DashboardOrdersIndexRoute
@@ -270,7 +315,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/about'
     | '/cart'
-    | '/categories'
     | '/contact'
     | '/deals'
     | '/help'
@@ -279,17 +323,23 @@ export interface FileRouteTypes {
     | '/shipping'
     | '/signin'
     | '/signup'
+    | '/blog/$slug'
+    | '/categories/$slug'
     | '/rules/cookies'
     | '/rules/privacy-policy'
     | '/rules/terms'
+    | '/shop/$slug'
     | '/blog/'
+    | '/categories/'
     | '/dashboard/'
     | '/shop/'
+    | '/dashboard/blog/categories'
     | '/dashboard/costumers/$costumersId'
     | '/dashboard/inventory/$id'
     | '/dashboard/inventory/categories'
     | '/dashboard/inventory/create'
     | '/dashboard/analytics/'
+    | '/dashboard/blog/'
     | '/dashboard/costumers/'
     | '/dashboard/inventory/'
     | '/dashboard/orders/'
@@ -298,7 +348,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/cart'
-    | '/categories'
     | '/contact'
     | '/deals'
     | '/help'
@@ -307,17 +356,23 @@ export interface FileRouteTypes {
     | '/shipping'
     | '/signin'
     | '/signup'
+    | '/blog/$slug'
+    | '/categories/$slug'
     | '/rules/cookies'
     | '/rules/privacy-policy'
     | '/rules/terms'
+    | '/shop/$slug'
     | '/blog'
+    | '/categories'
     | '/dashboard'
     | '/shop'
+    | '/dashboard/blog/categories'
     | '/dashboard/costumers/$costumersId'
     | '/dashboard/inventory/$id'
     | '/dashboard/inventory/categories'
     | '/dashboard/inventory/create'
     | '/dashboard/analytics'
+    | '/dashboard/blog'
     | '/dashboard/costumers'
     | '/dashboard/inventory'
     | '/dashboard/orders'
@@ -327,7 +382,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/about'
     | '/cart'
-    | '/categories'
     | '/contact'
     | '/deals'
     | '/help'
@@ -336,17 +390,23 @@ export interface FileRouteTypes {
     | '/shipping'
     | '/(auth)/signin'
     | '/(auth)/signup'
+    | '/blog/$slug'
+    | '/categories/$slug'
     | '/rules/cookies'
     | '/rules/privacy-policy'
     | '/rules/terms'
+    | '/shop/$slug'
     | '/blog/'
+    | '/categories/'
     | '/dashboard/'
     | '/shop/'
+    | '/dashboard/blog/categories'
     | '/dashboard/costumers/$costumersId'
     | '/dashboard/inventory/$id'
     | '/dashboard/inventory/categories'
     | '/dashboard/inventory/create'
     | '/dashboard/analytics/'
+    | '/dashboard/blog/'
     | '/dashboard/costumers/'
     | '/dashboard/inventory/'
     | '/dashboard/orders/'
@@ -357,7 +417,6 @@ export interface RootRouteChildren {
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   CartRoute: typeof CartRoute
-  CategoriesRoute: typeof CategoriesRoute
   ContactRoute: typeof ContactRoute
   DealsRoute: typeof DealsRoute
   HelpRoute: typeof HelpRoute
@@ -366,10 +425,14 @@ export interface RootRouteChildren {
   ShippingRoute: typeof ShippingRoute
   authSigninRoute: typeof authSigninRoute
   authSignupRoute: typeof authSignupRoute
+  BlogSlugRoute: typeof BlogSlugRoute
+  CategoriesSlugRoute: typeof CategoriesSlugRoute
   RulesCookiesRoute: typeof RulesCookiesRoute
   RulesPrivacyPolicyRoute: typeof RulesPrivacyPolicyRoute
   RulesTermsRoute: typeof RulesTermsRoute
+  ShopSlugRoute: typeof ShopSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  CategoriesIndexRoute: typeof CategoriesIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
 }
 
@@ -417,13 +480,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/categories': {
-      id: '/categories'
-      path: '/categories'
-      fullPath: '/categories'
-      preLoaderRoute: typeof CategoriesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/cart': {
       id: '/cart'
       path: '/cart'
@@ -466,11 +522,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/categories/': {
+      id: '/categories/'
+      path: '/categories'
+      fullPath: '/categories/'
+      preLoaderRoute: typeof CategoriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/': {
       id: '/blog/'
       path: '/blog'
       fullPath: '/blog/'
       preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop/$slug': {
+      id: '/shop/$slug'
+      path: '/shop/$slug'
+      fullPath: '/shop/$slug'
+      preLoaderRoute: typeof ShopSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rules/terms': {
@@ -492,6 +562,20 @@ declare module '@tanstack/react-router' {
       path: '/rules/cookies'
       fullPath: '/rules/cookies'
       preLoaderRoute: typeof RulesCookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories/$slug': {
+      id: '/categories/$slug'
+      path: '/categories/$slug'
+      fullPath: '/categories/$slug'
+      preLoaderRoute: typeof CategoriesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(auth)/signup': {
@@ -529,6 +613,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardCostumersIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/blog/': {
+      id: '/dashboard/blog/'
+      path: '/blog'
+      fullPath: '/dashboard/blog/'
+      preLoaderRoute: typeof DashboardBlogIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/analytics/': {
       id: '/dashboard/analytics/'
       path: '/analytics'
@@ -564,16 +655,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardCostumersCostumersIdRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/blog/categories': {
+      id: '/dashboard/blog/categories'
+      path: '/blog/categories'
+      fullPath: '/dashboard/blog/categories'
+      preLoaderRoute: typeof DashboardBlogCategoriesRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
   }
 }
 
 interface DashboardRouteRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardBlogCategoriesRoute: typeof DashboardBlogCategoriesRoute
   DashboardCostumersCostumersIdRoute: typeof DashboardCostumersCostumersIdRoute
   DashboardInventoryIdRoute: typeof DashboardInventoryIdRoute
   DashboardInventoryCategoriesRoute: typeof DashboardInventoryCategoriesRoute
   DashboardInventoryCreateRoute: typeof DashboardInventoryCreateRoute
   DashboardAnalyticsIndexRoute: typeof DashboardAnalyticsIndexRoute
+  DashboardBlogIndexRoute: typeof DashboardBlogIndexRoute
   DashboardCostumersIndexRoute: typeof DashboardCostumersIndexRoute
   DashboardInventoryIndexRoute: typeof DashboardInventoryIndexRoute
   DashboardOrdersIndexRoute: typeof DashboardOrdersIndexRoute
@@ -581,11 +681,13 @@ interface DashboardRouteRouteChildren {
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardBlogCategoriesRoute: DashboardBlogCategoriesRoute,
   DashboardCostumersCostumersIdRoute: DashboardCostumersCostumersIdRoute,
   DashboardInventoryIdRoute: DashboardInventoryIdRoute,
   DashboardInventoryCategoriesRoute: DashboardInventoryCategoriesRoute,
   DashboardInventoryCreateRoute: DashboardInventoryCreateRoute,
   DashboardAnalyticsIndexRoute: DashboardAnalyticsIndexRoute,
+  DashboardBlogIndexRoute: DashboardBlogIndexRoute,
   DashboardCostumersIndexRoute: DashboardCostumersIndexRoute,
   DashboardInventoryIndexRoute: DashboardInventoryIndexRoute,
   DashboardOrdersIndexRoute: DashboardOrdersIndexRoute,
@@ -600,7 +702,6 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   CartRoute: CartRoute,
-  CategoriesRoute: CategoriesRoute,
   ContactRoute: ContactRoute,
   DealsRoute: DealsRoute,
   HelpRoute: HelpRoute,
@@ -609,10 +710,14 @@ const rootRouteChildren: RootRouteChildren = {
   ShippingRoute: ShippingRoute,
   authSigninRoute: authSigninRoute,
   authSignupRoute: authSignupRoute,
+  BlogSlugRoute: BlogSlugRoute,
+  CategoriesSlugRoute: CategoriesSlugRoute,
   RulesCookiesRoute: RulesCookiesRoute,
   RulesPrivacyPolicyRoute: RulesPrivacyPolicyRoute,
   RulesTermsRoute: RulesTermsRoute,
+  ShopSlugRoute: ShopSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
+  CategoriesIndexRoute: CategoriesIndexRoute,
   ShopIndexRoute: ShopIndexRoute,
 }
 export const routeTree = rootRouteImport

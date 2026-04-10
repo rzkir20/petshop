@@ -5,11 +5,15 @@ import {
   redirect,
   useLocation,
 } from '@tanstack/react-router'
+import { useState } from 'react'
 
-import MainNav from '../../components/MainNav'
-import Sidebar from '../../components/Sidebar'
-import { useAuth } from '../../context/AuthContext'
-import { getSession } from '../../services/auth.service'
+import MainNav from '#/components/MainNav'
+
+import Sidebar from '#/components/Sidebar'
+
+import { useAuth } from '#/context/AuthContext'
+
+import { getSession } from '#/services/auth.service'
 
 export const Route = createFileRoute('/dashboard')({
   beforeLoad: async () => {
@@ -27,6 +31,7 @@ export const Route = createFileRoute('/dashboard')({
 function DashboardLayout() {
   const { status } = useAuth()
   const { pathname } = useLocation()
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   if (status === 'loading') return null
   if (status === 'anonymous') return <Navigate to="/signin" />
@@ -45,9 +50,21 @@ function DashboardLayout() {
 
   return (
     <div className="min-h-screen bg-[#f3faf5] text-[#173a40]">
-      <Sidebar activeItem={activeItem} />
-      <main className="ml-72">
-        <MainNav />
+      {isSidebarOpen ? (
+        <button
+          type="button"
+          aria-label="Close sidebar menu"
+          onClick={() => setIsSidebarOpen(false)}
+          className="fixed inset-0 z-30 bg-black/30 xl:hidden"
+        />
+      ) : null}
+      <Sidebar
+        activeItem={activeItem}
+        className={`${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} xl:translate-x-0`}
+        onNavigate={() => setIsSidebarOpen(false)}
+      />
+      <main className="xl:ml-72">
+        <MainNav onMenuClick={() => setIsSidebarOpen(true)} />
         <Outlet />
       </main>
     </div>

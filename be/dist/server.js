@@ -7,6 +7,7 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
+const blog_categories_routes_1 = __importDefault(require("./routes/blog-categories.routes"));
 const categories_routes_1 = __importDefault(require("./routes/categories.routes"));
 const products_routes_1 = __importDefault(require("./routes/products.routes"));
 const mongodb_1 = require("./utils/mongodb");
@@ -23,6 +24,7 @@ app.get("/", (_req, res) => {
     res.send("Hello World!");
 });
 app.use("/auth", auth_routes_1.default);
+app.use("/blog-categories", blog_categories_routes_1.default);
 app.use("/categories", categories_routes_1.default);
 app.use("/products", products_routes_1.default);
 async function bootstrap() {

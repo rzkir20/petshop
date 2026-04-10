@@ -6,7 +6,10 @@ import express, { Request, Response } from "express";
 
 import authRoutes from "./routes/auth.routes";
 
+import blogCategoriesRoutes from "./routes/blog-categories.routes";
+
 import categoriesRoutes from "./routes/categories.routes";
+
 import productsRoutes from "./routes/products.routes";
 
 import { connectToDatabase as connectDb } from "./utils/mongodb";
@@ -30,6 +33,7 @@ app.get("/", (_req: Request, res: Response) => {
 
 app.use("/auth", authRoutes);
 
+app.use("/blog-categories", blogCategoriesRoutes);
 app.use("/categories", categoriesRoutes);
 app.use("/products", productsRoutes);
 

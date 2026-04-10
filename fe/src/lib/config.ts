@@ -1,4 +1,4 @@
-const rawApiBaseUrl = import.meta.env.VITE_API_BASE_URL
+const rawApiBaseUrl = "https://petshop.spacedigitalia.biz.id"
 
 function normalizeApiBaseUrl(value: unknown): string {
   if (typeof value !== 'string') return ''

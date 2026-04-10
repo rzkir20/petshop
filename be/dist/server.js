@@ -8,6 +8,7 @@ const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const categories_routes_1 = __importDefault(require("./routes/categories.routes"));
+const products_routes_1 = __importDefault(require("./routes/products.routes"));
 const mongodb_1 = require("./utils/mongodb");
 const app = (0, express_1.default)();
 const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:3000";
@@ -23,6 +24,7 @@ app.get("/", (_req, res) => {
 });
 app.use("/auth", auth_routes_1.default);
 app.use("/categories", categories_routes_1.default);
+app.use("/products", products_routes_1.default);
 async function bootstrap() {
     await (0, mongodb_1.connectToDatabase)();
     app.listen(port, () => {

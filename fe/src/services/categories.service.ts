@@ -4,30 +4,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { createRestCrudResource } from '#/hooks/crud.service'
+import { createRestCrudResource } from '#/services/crud.service'
 
-export type CategoryStatus = 'active' | 'inactive'
-
-export type Category = {
-    _id: string
-    name: string
-    slug: string
-    status: CategoryStatus
-    createdAt: string
-    updatedAt: string
-}
-
-export type CreateCategoryInput = {
-    name: string
-    slug: string
-    status?: CategoryStatus
-}
-
-export type UpdateCategoryInput = {
-    name?: string
-    slug?: string
-    status?: CategoryStatus
-}
+import { slugifyFromName } from '#/hooks/slugify'
 
 /** TanStack Query keys for categories (invalidate / prefetch). */
 export const categoriesQueryKeys = {
@@ -74,35 +53,6 @@ export async function deleteCategory(id: string): Promise<void> {
     return categoriesApi.remove(id)
 }
 
-/** Derives API-safe slug from display name (lowercase, hyphens, a-z0-9 only). */
-export function slugifyFromName(name: string): string {
-    return name
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]+/g, '')
-        .replace(/-+/g, '-')
-        .replace(/^-+|-+$/g, '')
-}
-
-export function formatUpdatedAt(iso: string): string {
-    const d = new Date(iso)
-    if (Number.isNaN(d.getTime())) return '—'
-    const diff = Date.now() - d.getTime()
-    const mins = Math.floor(diff / 60000)
-    if (mins < 1) return 'Baru saja'
-    if (mins < 60) return `${mins} menit lalu`
-    const hours = Math.floor(mins / 60)
-    if (hours < 24) return `${hours} jam lalu`
-    const days = Math.floor(hours / 24)
-    if (days < 7) return `${days} hari lalu`
-    return d.toLocaleDateString('id-ID', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-    })
-}
-
 function errMessage(e: unknown): string {
     return e instanceof Error ? e.message : 'Terjadi kesalahan'
 }
@@ -122,10 +72,41 @@ export function useCategoriesCrudState() {
     const categoriesQuery = useQuery({
         queryKey: categoriesQueryKeys.list(),
         queryFn: listCategories,
+        // Cache behavior
+        staleTime: 30_000, // 30s: avoid refetch spam while navigating
+        gcTime: 10 * 60_000, // 10m: keep cache in memory
+        refetchOnWindowFocus: false,
     })
 
     const createMutation = useMutation({
         mutationFn: async (input: CreateCategoryInput) => createCategory(input),
+        onMutate: async (input) => {
+            await queryClient.cancelQueries({ queryKey: categoriesQueryKeys.list() })
+            const previous = queryClient.getQueryData<Category[]>(
+                categoriesQueryKeys.list(),
+            )
+
+            const optimistic: Category = {
+                _id: `optimistic-${Math.random().toString(16).slice(2)}`,
+                name: input.name,
+                slug: input.slug,
+                status: input.status ?? 'active',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+            }
+
+            queryClient.setQueryData<Category[]>(
+                categoriesQueryKeys.list(),
+                (curr) => [optimistic, ...(curr ?? [])],
+            )
+
+            return { previous }
+        },
+        onError: (_err, _input, ctx) => {
+            if (ctx?.previous) {
+                queryClient.setQueryData(categoriesQueryKeys.list(), ctx.previous)
+            }
+        },
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: categoriesQueryKeys.list() })
             setAddOpen(false)
@@ -140,6 +121,33 @@ export function useCategoriesCrudState() {
             id: string
             input: UpdateCategoryInput
         }) => updateCategory(id, input),
+        onMutate: async ({ id, input }) => {
+            await queryClient.cancelQueries({ queryKey: categoriesQueryKeys.list() })
+            const previous = queryClient.getQueryData<Category[]>(
+                categoriesQueryKeys.list(),
+            )
+
+            queryClient.setQueryData<Category[]>(
+                categoriesQueryKeys.list(),
+                (curr) =>
+                    (curr ?? []).map((c) =>
+                        c._id === id
+                            ? {
+                                ...c,
+                                ...input,
+                                updatedAt: new Date().toISOString(),
+                            }
+                            : c,
+                    ),
+            )
+
+            return { previous }
+        },
+        onError: (_err, _vars, ctx) => {
+            if (ctx?.previous) {
+                queryClient.setQueryData(categoriesQueryKeys.list(), ctx.previous)
+            }
+        },
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: categoriesQueryKeys.list() })
             setEditing(null)
@@ -148,6 +156,22 @@ export function useCategoriesCrudState() {
 
     const deleteMutation = useMutation({
         mutationFn: (id: string) => deleteCategory(id),
+        onMutate: async (id) => {
+            await queryClient.cancelQueries({ queryKey: categoriesQueryKeys.list() })
+            const previous = queryClient.getQueryData<Category[]>(
+                categoriesQueryKeys.list(),
+            )
+            queryClient.setQueryData<Category[]>(
+                categoriesQueryKeys.list(),
+                (curr) => (curr ?? []).filter((c) => c._id !== id),
+            )
+            return { previous }
+        },
+        onError: (_err, _id, ctx) => {
+            if (ctx?.previous) {
+                queryClient.setQueryData(categoriesQueryKeys.list(), ctx.previous)
+            }
+        },
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: categoriesQueryKeys.list() })
             setDeleting(null)

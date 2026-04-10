@@ -15,7 +15,9 @@ export async function requestJson<T>(
   const url = `${baseTrim}${path.startsWith('/') ? path : `/${path}`}`
   const headers = new Headers(init.headers)
   headers.set('Accept', 'application/json')
-  if (!headers.has('Content-Type') && init.body != null) {
+  const isFormDataBody =
+    typeof FormData !== 'undefined' && init.body instanceof FormData
+  if (!headers.has('Content-Type') && init.body != null && !isFormDataBody) {
     headers.set('Content-Type', 'application/json')
   }
 

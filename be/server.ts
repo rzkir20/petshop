@@ -7,6 +7,7 @@ import express, { Request, Response } from "express";
 import authRoutes from "./routes/auth.routes";
 
 import categoriesRoutes from "./routes/categories.routes";
+import productsRoutes from "./routes/products.routes";
 
 import { connectToDatabase as connectDb } from "./utils/mongodb";
 
@@ -30,6 +31,7 @@ app.get("/", (_req: Request, res: Response) => {
 app.use("/auth", authRoutes);
 
 app.use("/categories", categoriesRoutes);
+app.use("/products", productsRoutes);
 
 async function bootstrap() {
   await connectDb();

@@ -27,10 +27,9 @@ import { Label } from '#/components/ui/label'
 
 import { Select } from '#/components/ui/select'
 
-import {
-  formatUpdatedAt,
-  useCategoriesCrudState,
-} from '#/services/categories.service'
+import { useCategoriesCrudState } from '#/services/categories.service'
+
+import { formatUpdatedAt } from '#/hooks/format-date'
 
 export const Route = createFileRoute('/dashboard/inventory/categories')({
   component: InventoryCategoriesPage,

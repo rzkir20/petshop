@@ -8,7 +8,20 @@ import * as Blog from "../models/Blog";
 
 import type { BlogUpdateFields } from "../models/Blog";
 
-import { parseUpdateBlogBody } from "../hooks/helper";
+import { parseUpdateBlogBody, uploadImageToImageKit } from "../hooks/helper";
+
+/** Multipart `author` is often a JSON string; normalize before `parseAuthor` / `parseUpdateBlogBody`. */
+function normalizedBlogBody(req: Request): Record<string, unknown> {
+    const body = (req.body || {}) as Record<string, unknown>;
+    if (typeof body.author === "string") {
+        try {
+            body.author = JSON.parse(body.author) as unknown;
+        } catch {
+            // leave as string; parseAuthor will reject
+        }
+    }
+    return body;
+}
 
 function parseAuthor(body: Record<string, unknown>): AuthorBlog | null {
     const raw = body.author;
@@ -92,7 +105,7 @@ export async function getBySlug(req: Request, res: Response) {
 export async function create(req: Request, res: Response) {
     try {
         await Blog.ensureIndexes();
-        const body = (req.body || {}) as Record<string, unknown>;
+        const body = normalizedBlogBody(req);
         const categorySlug = String(body.category ?? "").trim();
         const cat = await resolveActiveBlogCategory(categorySlug);
         if (!cat) {
@@ -109,10 +122,28 @@ export async function create(req: Request, res: Response) {
             });
         }
 
+        const file = req.file;
+        let thumbnail = String(body.thumbnail ?? "").trim();
+        if (file) {
+            try {
+                thumbnail = await uploadImageToImageKit(file, { folder: "/blogs" });
+            } catch (err: unknown) {
+                if (
+                    err instanceof Error &&
+                    err.message === "ImageKit is not configured"
+                ) {
+                    return res
+                        .status(500)
+                        .json({ message: "ImageKit is not configured" });
+                }
+                throw err;
+            }
+        }
+
         const row = await Blog.createBlog({
             title: String(body.title ?? ""),
             slug: String(body.slug ?? ""),
-            thumbnail: String(body.thumbnail ?? "").trim(),
+            thumbnail,
             description: String(body.description ?? "").trim(),
             content: String(body.content ?? "").trim(),
             status:
@@ -131,6 +162,12 @@ export async function create(req: Request, res: Response) {
         });
     } catch (err: unknown) {
         if (
+            err instanceof Error &&
+            err.message === "ImageKit is not configured"
+        ) {
+            return res.status(500).json({ message: "ImageKit is not configured" });
+        }
+        if (
             typeof err === "object" &&
             err !== null &&
             "code" in err &&
@@ -146,7 +183,29 @@ export async function create(req: Request, res: Response) {
 export async function update(req: Request, res: Response) {
     try {
         const { id } = req.params;
-        const parsed = parseUpdateBlogBody(req.body);
+        const body = normalizedBlogBody(req);
+        const file = req.file;
+
+        let parsed = parseUpdateBlogBody(body);
+
+        if (file) {
+            let thumbUrl: string;
+            try {
+                thumbUrl = await uploadImageToImageKit(file, { folder: "/blogs" });
+            } catch (err: unknown) {
+                if (
+                    err instanceof Error &&
+                    err.message === "ImageKit is not configured"
+                ) {
+                    return res
+                        .status(500)
+                        .json({ message: "ImageKit is not configured" });
+                }
+                throw err;
+            }
+            parsed = { ...(parsed ?? {}), thumbnail: thumbUrl };
+        }
+
         if (!parsed) {
             return res.status(400).json({
                 message:

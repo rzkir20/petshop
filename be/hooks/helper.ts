@@ -325,14 +325,18 @@ export function parseUpdateProductBody(body: unknown): UpdateProductInput | null
     return out;
 }
 
-export async function uploadImageToImageKit(file: Express.Multer.File): Promise<string> {
+export async function uploadImageToImageKit(
+    file: Express.Multer.File,
+    opts?: { folder?: string },
+): Promise<string> {
     if (!isImageKitConfigured || !imagekit) {
         throw new Error("ImageKit is not configured");
     }
+    const folder = opts?.folder ?? "/products";
     const upload = await imagekit.upload({
         file: file.buffer.toString("base64"),
         fileName: `${Date.now()}-${file.originalname || "product-image"}`,
-        folder: "/products",
+        folder,
     });
     return String(upload.url || "");
 }
@@ -340,6 +344,8 @@ export async function uploadImageToImageKit(file: Express.Multer.File): Promise<
 export async function uploadManyImagesToImageKit(
     files: Express.Multer.File[],
 ): Promise<string[]> {
-    const urls = await Promise.all(files.map((file) => uploadImageToImageKit(file)));
+    const urls = await Promise.all(
+        files.map((file) => uploadImageToImageKit(file)),
+    );
     return urls.filter(Boolean);
 }

@@ -43,6 +43,19 @@ const mongoose_1 = require("mongoose");
 const BlogCategories = __importStar(require("../models/BlogCategories"));
 const Blog = __importStar(require("../models/Blog"));
 const helper_1 = require("../hooks/helper");
+/** Multipart `author` is often a JSON string; normalize before `parseAuthor` / `parseUpdateBlogBody`. */
+function normalizedBlogBody(req) {
+    const body = (req.body || {});
+    if (typeof body.author === "string") {
+        try {
+            body.author = JSON.parse(body.author);
+        }
+        catch {
+            // leave as string; parseAuthor will reject
+        }
+    }
+    return body;
+}
 function parseAuthor(body) {
     const raw = body.author;
     if (!raw || typeof raw !== "object")
@@ -122,7 +135,7 @@ async function getBySlug(req, res) {
 async function create(req, res) {
     try {
         await Blog.ensureIndexes();
-        const body = (req.body || {});
+        const body = normalizedBlogBody(req);
         const categorySlug = String(body.category ?? "").trim();
         const cat = await resolveActiveBlogCategory(categorySlug);
         if (!cat) {
@@ -136,10 +149,26 @@ async function create(req, res) {
                 message: "author must be an object with name (non-empty) and pictures (string)",
             });
         }
+        const file = req.file;
+        let thumbnail = String(body.thumbnail ?? "").trim();
+        if (file) {
+            try {
+                thumbnail = await (0, helper_1.uploadImageToImageKit)(file, { folder: "/blogs" });
+            }
+            catch (err) {
+                if (err instanceof Error &&
+                    err.message === "ImageKit is not configured") {
+                    return res
+                        .status(500)
+                        .json({ message: "ImageKit is not configured" });
+                }
+                throw err;
+            }
+        }
         const row = await Blog.createBlog({
             title: String(body.title ?? ""),
             slug: String(body.slug ?? ""),
-            thumbnail: String(body.thumbnail ?? "").trim(),
+            thumbnail,
             description: String(body.description ?? "").trim(),
             content: String(body.content ?? "").trim(),
             status: body.status === "published"
@@ -156,6 +185,10 @@ async function create(req, res) {
         });
     }
     catch (err) {
+        if (err instanceof Error &&
+            err.message === "ImageKit is not configured") {
+            return res.status(500).json({ message: "ImageKit is not configured" });
+        }
         if (typeof err === "object" &&
             err !== null &&
             "code" in err &&
@@ -169,7 +202,25 @@ async function create(req, res) {
 async function update(req, res) {
     try {
         const { id } = req.params;
-        const parsed = (0, helper_1.parseUpdateBlogBody)(req.body);
+        const body = normalizedBlogBody(req);
+        const file = req.file;
+        let parsed = (0, helper_1.parseUpdateBlogBody)(body);
+        if (file) {
+            let thumbUrl;
+            try {
+                thumbUrl = await (0, helper_1.uploadImageToImageKit)(file, { folder: "/blogs" });
+            }
+            catch (err) {
+                if (err instanceof Error &&
+                    err.message === "ImageKit is not configured") {
+                    return res
+                        .status(500)
+                        .json({ message: "ImageKit is not configured" });
+                }
+                throw err;
+            }
+            parsed = { ...(parsed ?? {}), thumbnail: thumbUrl };
+        }
         if (!parsed) {
             return res.status(400).json({
                 message: "Provide at least one valid field (title, slug, thumbnail, description, content, status, category, author)",

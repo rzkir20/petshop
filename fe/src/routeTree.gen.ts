@@ -31,6 +31,7 @@ import { Route as CategoriesSlugRouteImport } from './routes/categories/$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as authSignupRouteImport } from './routes/(auth)/signup'
 import { Route as authSigninRouteImport } from './routes/(auth)/signin'
+import { Route as DashboardSettingsIndexRouteImport } from './routes/dashboard/settings/index'
 import { Route as DashboardOrdersIndexRouteImport } from './routes/dashboard/orders/index'
 import { Route as DashboardInventoryIndexRouteImport } from './routes/dashboard/inventory/index'
 import { Route as DashboardCostumersIndexRouteImport } from './routes/dashboard/costumers/index'
@@ -154,6 +155,11 @@ const authSigninRoute = authSigninRouteImport.update({
   path: '/signin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardSettingsIndexRoute = DashboardSettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const DashboardOrdersIndexRoute = DashboardOrdersIndexRouteImport.update({
   id: '/orders/',
   path: '/orders/',
@@ -253,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/costumers/': typeof DashboardCostumersIndexRoute
   '/dashboard/inventory/': typeof DashboardInventoryIndexRoute
   '/dashboard/orders/': typeof DashboardOrdersIndexRoute
+  '/dashboard/settings/': typeof DashboardSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -288,6 +295,7 @@ export interface FileRoutesByTo {
   '/dashboard/costumers': typeof DashboardCostumersIndexRoute
   '/dashboard/inventory': typeof DashboardInventoryIndexRoute
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
+  '/dashboard/settings': typeof DashboardSettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -325,6 +333,7 @@ export interface FileRoutesById {
   '/dashboard/costumers/': typeof DashboardCostumersIndexRoute
   '/dashboard/inventory/': typeof DashboardInventoryIndexRoute
   '/dashboard/orders/': typeof DashboardOrdersIndexRoute
+  '/dashboard/settings/': typeof DashboardSettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -363,6 +372,7 @@ export interface FileRouteTypes {
     | '/dashboard/costumers/'
     | '/dashboard/inventory/'
     | '/dashboard/orders/'
+    | '/dashboard/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -398,6 +408,7 @@ export interface FileRouteTypes {
     | '/dashboard/costumers'
     | '/dashboard/inventory'
     | '/dashboard/orders'
+    | '/dashboard/settings'
   id:
     | '__root__'
     | '/'
@@ -434,6 +445,7 @@ export interface FileRouteTypes {
     | '/dashboard/costumers/'
     | '/dashboard/inventory/'
     | '/dashboard/orders/'
+    | '/dashboard/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -616,6 +628,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authSigninRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/settings/': {
+      id: '/dashboard/settings/'
+      path: '/settings'
+      fullPath: '/dashboard/settings/'
+      preLoaderRoute: typeof DashboardSettingsIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/orders/': {
       id: '/dashboard/orders/'
       path: '/orders'
@@ -717,6 +736,7 @@ interface DashboardRouteRouteChildren {
   DashboardCostumersIndexRoute: typeof DashboardCostumersIndexRoute
   DashboardInventoryIndexRoute: typeof DashboardInventoryIndexRoute
   DashboardOrdersIndexRoute: typeof DashboardOrdersIndexRoute
+  DashboardSettingsIndexRoute: typeof DashboardSettingsIndexRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
@@ -733,6 +753,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardCostumersIndexRoute: DashboardCostumersIndexRoute,
   DashboardInventoryIndexRoute: DashboardInventoryIndexRoute,
   DashboardOrdersIndexRoute: DashboardOrdersIndexRoute,
+  DashboardSettingsIndexRoute: DashboardSettingsIndexRoute,
 }
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(

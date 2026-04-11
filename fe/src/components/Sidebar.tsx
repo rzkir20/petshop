@@ -75,7 +75,12 @@ const mainMenuItems: SidebarItem[] = [
 ]
 
 const accountItems: SidebarItem[] = [
-  { id: 'settings', label: 'Settings', icon: Settings, href: '#settings' },
+  {
+    id: 'settings',
+    label: 'Settings',
+    icon: Settings,
+    href: '/dashboard/settings',
+  },
   { id: 'support', label: 'Support', icon: HelpCircle, href: '#support' },
 ]
 
@@ -206,9 +211,9 @@ export default function Sidebar({
             const Icon = item.icon
             const isActive = activeItem === item.id
             return (
-              <a
+              <Link
                 key={item.id}
-                href={item.href}
+                to={item.href}
                 className={`flex items-center gap-3 rounded-[20px] px-4 py-3.5 transition-all duration-300 ${
                   isActive
                     ? 'bg-emerald-500 text-white'
@@ -217,7 +222,7 @@ export default function Sidebar({
               >
                 <Icon size={20} />
                 <span className="font-medium">{item.label}</span>
-              </a>
+              </Link>
             )
           })}
         </div>

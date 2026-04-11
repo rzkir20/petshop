@@ -4,14 +4,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const multer_1 = __importDefault(require("multer"));
 const blog_controller_1 = require("../controllers/blog.controller");
 const validate_1 = require("../middlewares/validate");
 const helper_1 = require("../hooks/helper");
 const router = express_1.default.Router();
+const upload = (0, multer_1.default)({ storage: multer_1.default.memoryStorage() });
 router.get("/", blog_controller_1.list);
 router.get("/by-slug/:slug", blog_controller_1.getBySlug);
 router.get("/:id", blog_controller_1.getById);
-router.post("/", (0, validate_1.validateBody)({
+router.post("/", upload.single("thumbnail"), (0, validate_1.validateBody)({
     title: { required: true, minLen: 1 },
     slug: {
         required: true,
@@ -25,6 +27,6 @@ router.post("/", (0, validate_1.validateBody)({
     status: { required: false, oneOf: ["published", "draft"] },
     category: { required: true, minLen: 1 },
 }), blog_controller_1.create);
-router.patch("/:id", blog_controller_1.update);
+router.patch("/:id", upload.single("thumbnail"), blog_controller_1.update);
 router.delete("/:id", blog_controller_1.remove);
 exports.default = router;

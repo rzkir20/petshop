@@ -362,14 +362,15 @@ function parseUpdateProductBody(body) {
         return null;
     return out;
 }
-async function uploadImageToImageKit(file) {
+async function uploadImageToImageKit(file, opts) {
     if (!imgkit_1.isImageKitConfigured || !imgkit_1.default) {
         throw new Error("ImageKit is not configured");
     }
+    const folder = opts?.folder ?? "/products";
     const upload = await imgkit_1.default.upload({
         file: file.buffer.toString("base64"),
         fileName: `${Date.now()}-${file.originalname || "product-image"}`,
-        folder: "/products",
+        folder,
     });
     return String(upload.url || "");
 }

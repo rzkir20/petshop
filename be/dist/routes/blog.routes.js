@@ -4,23 +4,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const categories_controller_1 = require("../controllers/categories.controller");
+const blog_controller_1 = require("../controllers/blog.controller");
 const validate_1 = require("../middlewares/validate");
 const helper_1 = require("../hooks/helper");
 const router = express_1.default.Router();
-router.get("/", categories_controller_1.list);
-router.get("/:id", categories_controller_1.getById);
+router.get("/", blog_controller_1.list);
+router.get("/by-slug/:slug", blog_controller_1.getBySlug);
+router.get("/:id", blog_controller_1.getById);
 router.post("/", (0, validate_1.validateBody)({
-    name: { required: true, minLen: 1 },
-    description: { required: false, minLen: 1 },
+    title: { required: true, minLen: 1 },
     slug: {
         required: true,
         minLen: 1,
         pattern: helper_1.slugPattern,
         patternMessage: "slug must be lowercase letters, numbers, and single hyphens between segments",
     },
-    status: { required: false, oneOf: ["active", "inactive"] },
-}), categories_controller_1.create);
-router.patch("/:id", categories_controller_1.update);
-router.delete("/:id", categories_controller_1.remove);
+    thumbnail: { required: false, minLen: 0 },
+    description: { required: false, minLen: 0 },
+    content: { required: true, minLen: 1 },
+    status: { required: false, oneOf: ["published", "draft"] },
+    category: { required: true, minLen: 1 },
+}), blog_controller_1.create);
+router.patch("/:id", blog_controller_1.update);
+router.delete("/:id", blog_controller_1.remove);
 exports.default = router;

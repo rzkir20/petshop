@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import cookieParser from "cookie-parser";
 
 import cors from "cors";
@@ -8,6 +10,8 @@ import authRoutes from "./routes/auth.routes";
 
 import blogCategoriesRoutes from "./routes/blog-categories.routes";
 
+import blogRoutes from "./routes/blog.routes";
+
 import categoriesRoutes from "./routes/categories.routes";
 
 import productsRoutes from "./routes/products.routes";
@@ -15,8 +19,10 @@ import productsRoutes from "./routes/products.routes";
 import { connectToDatabase as connectDb } from "./utils/mongodb";
 
 const app = express();
-const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:3000";
-const port = Number(process.env.PORT || 3001);
+
+const corsOrigin = process.env.CORS_ORIGIN;
+
+const port = Number(process.env.PORT);
 
 app.use(
   cors({
@@ -34,6 +40,7 @@ app.get("/", (_req: Request, res: Response) => {
 app.use("/auth", authRoutes);
 
 app.use("/blog-categories", blogCategoriesRoutes);
+app.use("/blogs", blogRoutes);
 app.use("/categories", categoriesRoutes);
 app.use("/products", productsRoutes);
 

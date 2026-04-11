@@ -1,19 +1,12 @@
 import { Request, Response } from "express";
+
 import jwt from "jsonwebtoken";
 
 import * as Accounts from "../models/Accounts";
+
 import { hashPassword, verifyPassword } from "../utils/password";
 
-function getJwtCookieOptions() {
-  const isProduction = process.env.NODE_ENV === "production";
-  return {
-    httpOnly: true,
-    sameSite: isProduction ? ("none" as const) : ("lax" as const),
-    secure: isProduction,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    path: "/",
-  };
-}
+import { getJwtCookieOptions } from "../hooks/helper";
 
 export async function signup(req: Request, res: Response) {
   try {

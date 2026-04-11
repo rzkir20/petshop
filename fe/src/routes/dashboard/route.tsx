@@ -11,6 +11,8 @@ import MainNav from '#/components/MainNav'
 
 import Sidebar from '#/components/Sidebar'
 
+import { LoadingScreen } from '#/components/ui/LoadingScreen'
+
 import { useAuth } from '#/context/AuthContext'
 
 import { getSession } from '#/services/auth.service'
@@ -33,7 +35,7 @@ function DashboardLayout() {
   const { pathname } = useLocation()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
-  if (status === 'loading') return null
+  if (status === 'loading') return <LoadingScreen />
   if (status === 'anonymous') return <Navigate to="/signin" />
 
   const activeItem = pathname.startsWith('/dashboard/analytics')

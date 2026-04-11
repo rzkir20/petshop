@@ -7,8 +7,6 @@ import {
   Types,
 } from "mongoose";
 
-import type { StockStatus } from "../types/products";
-
 const productSchema = new Schema(
   {
     title: { type: String, required: true, trim: true },
@@ -39,38 +37,9 @@ const productSchema = new Schema(
   { timestamps: true, collection: "products" },
 );
 
-type ProductDocument = InferSchemaType<typeof productSchema> & {
-  _id?: Types.ObjectId;
-};
-
 const ProductModel =
   (models.Product as Model<InferSchemaType<typeof productSchema>>) ||
   model("Product", productSchema);
-
-export type CreateProductInput = {
-  title: string;
-  slug?: string;
-  expiredAt: string;
-  flavor: string;
-  weight: string;
-  thumbnail?: string;
-  images?: string[];
-  price: number;
-  content: string;
-  isBestSeller?: boolean;
-  stockCurrent: number;
-  stockMax: number;
-  reorder: string;
-  status: StockStatus;
-  category: string;
-};
-
-export type UpdateProductInput = Partial<CreateProductInput>;
-
-export type ListProductsInput = {
-  category?: string;
-  q?: string;
-};
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

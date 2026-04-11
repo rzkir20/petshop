@@ -1,149 +1,14 @@
 import { Request, Response } from "express";
 
 import * as Categories from "../models/Categories";
+
 import * as Products from "../models/Products";
+
 import imagekit, { isImageKitConfigured } from "../utils/imgkit";
-import type { StockStatus } from "../types/products";
 
 const STOCK_STATUS_VALUES = ["in-stock", "low-stock", "out-of-stock"] as const;
 
-function asString(value: unknown): string {
-  return String(value ?? "").trim();
-}
-
-function asNumber(value: unknown): number {
-  if (typeof value === "number") return value;
-  if (typeof value === "string") return Number(value);
-  return Number.NaN;
-}
-
-function asBoolean(value: unknown): boolean | null {
-  if (typeof value === "boolean") return value;
-  if (typeof value === "string") {
-    if (value === "true") return true;
-    if (value === "false") return false;
-  }
-  return null;
-}
-
-function toSlug(value: string): string {
-  return String(value || "")
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]+/g, "")
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-async function uploadImageToImageKit(file: Express.Multer.File): Promise<string> {
-  if (!isImageKitConfigured || !imagekit) {
-    throw new Error("ImageKit is not configured");
-  }
-  const upload = await imagekit.upload({
-    file: file.buffer.toString("base64"),
-    fileName: `${Date.now()}-${file.originalname || "product-image"}`,
-    folder: "/products",
-  });
-  return String(upload.url || "");
-}
-
-async function uploadManyImagesToImageKit(
-  files: Express.Multer.File[],
-): Promise<string[]> {
-  const urls = await Promise.all(files.map((file) => uploadImageToImageKit(file)));
-  return urls.filter(Boolean);
-}
-
-function parseUpdateBody(body: unknown): Products.UpdateProductInput | null {
-  const b = (body || {}) as Record<string, unknown>;
-  const out: Products.UpdateProductInput = {};
-
-  if ("title" in b) {
-    const title = asString(b.title);
-    if (title.length < 1) return null;
-    out.title = title;
-  }
-  if ("slug" in b) {
-    const slug = toSlug(asString(b.slug));
-    if (slug.length < 1) return null;
-    out.slug = slug;
-  }
-  if ("expiredAt" in b) {
-    const expiredAt = asString(b.expiredAt);
-    if (expiredAt.length < 1) return null;
-    out.expiredAt = expiredAt;
-  }
-  if ("flavor" in b) {
-    const flavor = asString(b.flavor);
-    if (flavor.length < 1) return null;
-    out.flavor = flavor;
-  }
-  if ("weight" in b) {
-    const weight = asString(b.weight);
-    if (weight.length < 1) return null;
-    out.weight = weight;
-  }
-  if ("thumbnail" in b) {
-    out.thumbnail = asString(b.thumbnail);
-  }
-  if ("images" in b) {
-    if (Array.isArray(b.images)) {
-      out.images = b.images.map((v) => asString(v)).filter(Boolean);
-    } else if (typeof b.images === "string") {
-      try {
-        const parsed = JSON.parse(b.images) as unknown;
-        if (!Array.isArray(parsed)) return null;
-        out.images = parsed.map((v) => asString(v)).filter(Boolean);
-      } catch {
-        return null;
-      }
-    } else {
-      return null;
-    }
-  }
-  if ("price" in b) {
-    const price = asNumber(b.price);
-    if (!Number.isFinite(price) || price < 0) return null;
-    out.price = price;
-  }
-  if ("content" in b) {
-    const content = asString(b.content);
-    if (content.length < 1) return null;
-    out.content = content;
-  }
-  if ("isBestSeller" in b) {
-    const isBestSeller = asBoolean(b.isBestSeller);
-    if (isBestSeller === null) return null;
-    out.isBestSeller = isBestSeller;
-  }
-  if ("stockCurrent" in b) {
-    const stockCurrent = asNumber(b.stockCurrent);
-    if (!Number.isFinite(stockCurrent) || stockCurrent < 0) return null;
-    out.stockCurrent = stockCurrent;
-  }
-  if ("stockMax" in b) {
-    const stockMax = asNumber(b.stockMax);
-    if (!Number.isFinite(stockMax) || stockMax < 0) return null;
-    out.stockMax = stockMax;
-  }
-  if ("reorder" in b) {
-    const reorder = asString(b.reorder);
-    if (reorder.length < 1) return null;
-    out.reorder = reorder;
-  }
-  if ("status" in b) {
-    if (!STOCK_STATUS_VALUES.includes(asString(b.status) as StockStatus)) return null;
-    out.status = asString(b.status) as StockStatus;
-  }
-  if ("category" in b) {
-    const category = asString(b.category).toLowerCase();
-    if (category.length < 1) return null;
-    out.category = category;
-  }
-  if (Object.keys(out).length === 0) return null;
-  return out;
-}
+import { asString, asNumber, asBoolean, toSlug, parseUpdateProductBody, uploadImageToImageKit, uploadManyImagesToImageKit } from "../hooks/helper";
 
 export async function list(req: Request, res: Response) {
   try {
@@ -247,6 +112,7 @@ export async function create(req: Request, res: Response) {
       status,
       category: category.slug,
     });
+    await Categories.incrementCategoryCount(category.slug, 1);
 
     return res.status(201).json({
       message: "Product created",
@@ -272,14 +138,14 @@ export async function create(req: Request, res: Response) {
 export async function update(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const parsed = parseUpdateBody(req.body);
+    const parsed = parseUpdateProductBody(req.body);
     const files = (req.files as Express.Multer.File[] | undefined) ?? [];
     if (!parsed && files.length === 0) {
       return res.status(400).json({
         message: "Provide at least one valid product field to update",
       });
     }
-    const payload: Products.UpdateProductInput = parsed ?? {};
+    const payload: UpdateProductInput = parsed ?? {};
 
     if (files.length > 0) {
       const uploadedImages = await uploadManyImagesToImageKit(files);
@@ -305,10 +171,16 @@ export async function update(req: Request, res: Response) {
     if (!existing) {
       return res.status(404).json({ message: "Product not found" });
     }
+    const previousCategory = String(existing.category || "").toLowerCase();
 
     const row = await Products.updateProduct(String(id || ""), payload);
     if (!row) {
       return res.status(404).json({ message: "Product not found" });
+    }
+    const nextCategory = String(row.category || "").toLowerCase();
+    if (nextCategory && previousCategory && nextCategory !== previousCategory) {
+      await Categories.incrementCategoryCount(previousCategory, -1);
+      await Categories.incrementCategoryCount(nextCategory, 1);
     }
 
     return res.status(200).json({
@@ -335,10 +207,15 @@ export async function update(req: Request, res: Response) {
 export async function remove(req: Request, res: Response) {
   try {
     const { id } = req.params;
+    const existing = await Products.findById(String(id || ""));
+    if (!existing) {
+      return res.status(404).json({ message: "Product not found" });
+    }
     const ok = await Products.deleteProduct(String(id || ""));
     if (!ok) {
       return res.status(404).json({ message: "Product not found" });
     }
+    await Categories.incrementCategoryCount(String(existing.category || ""), -1);
     return res.status(200).json({ message: "Product deleted" });
   } catch (err) {
     console.error(err);

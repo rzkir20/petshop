@@ -39,44 +39,7 @@ exports.create = create;
 exports.update = update;
 exports.remove = remove;
 const Categories = __importStar(require("../models/Categories"));
-const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-function parseUpdateBody(body) {
-    const b = (body || {});
-    const out = {};
-    if ("name" in b) {
-        if (typeof b.name !== "string") {
-            return null;
-        }
-        out.name = b.name;
-    }
-    if ("slug" in b) {
-        if (typeof b.slug !== "string") {
-            return null;
-        }
-        out.slug = b.slug;
-    }
-    if ("status" in b) {
-        if (b.status !== "active" && b.status !== "inactive") {
-            return null;
-        }
-        out.status = b.status;
-    }
-    if (out.name === undefined &&
-        out.slug === undefined &&
-        out.status === undefined) {
-        return null;
-    }
-    if (out.name !== undefined && String(out.name).trim().length < 1) {
-        return null;
-    }
-    if (out.slug !== undefined) {
-        const s = String(out.slug).trim();
-        if (s.length < 1 || !SLUG_PATTERN.test(s.toLowerCase())) {
-            return null;
-        }
-    }
-    return out;
-}
+const helper_1 = require("../hooks/helper");
 async function list(_req, res) {
     try {
         await Categories.ensureIndexes();
@@ -107,9 +70,10 @@ async function getById(req, res) {
 async function create(req, res) {
     try {
         await Categories.ensureIndexes();
-        const { name, slug, status } = (req.body || {});
+        const { name, description, slug, status } = (req.body || {});
         const row = await Categories.createCategory({
             name: String(name || ""),
+            description: String(description || ""),
             slug: String(slug || ""),
             status: status === "inactive"
                 ? "inactive"
@@ -136,10 +100,10 @@ async function create(req, res) {
 async function update(req, res) {
     try {
         const { id } = req.params;
-        const parsed = parseUpdateBody(req.body);
+        const parsed = (0, helper_1.parseUpdateCategoryBody)(req.body);
         if (!parsed) {
             return res.status(400).json({
-                message: "Provide at least one valid field: name (non-empty), slug (valid format), or status (active|inactive)",
+                message: "Provide at least one valid field: name (non-empty), description (string), slug (valid format), or status (active|inactive)",
             });
         }
         const existing = await Categories.findById(String(id || ""));

@@ -7,8 +7,6 @@ import {
   Types,
 } from "mongoose";
 
-import type { BlogCategoryStatus } from "../types/blog-categories";
-
 const blogCategorySchema = new Schema(
   {
     name: { type: String, required: true, trim: true },
@@ -28,25 +26,9 @@ const blogCategorySchema = new Schema(
   { timestamps: true, collection: "blog_categories" },
 );
 
-type BlogCategoryDocument = InferSchemaType<typeof blogCategorySchema> & {
-  _id?: Types.ObjectId;
-};
-
 const BlogCategoryModel =
   (models.BlogCategory as Model<InferSchemaType<typeof blogCategorySchema>>) ||
   model("BlogCategory", blogCategorySchema);
-
-export type CreateBlogCategoryInput = {
-  name: string;
-  slug: string;
-  status?: BlogCategoryStatus;
-};
-
-export type UpdateBlogCategoryInput = {
-  name?: string;
-  slug?: string;
-  status?: BlogCategoryStatus;
-};
 
 function normalizeSlug(slug: string): string {
   return String(slug || "")

@@ -1,6 +1,7 @@
 import express from "express";
 
 import { session, signin, signout, signup } from "../controllers/auth.controller";
+
 import { validateBody } from "../middlewares/validate";
 
 const router = express.Router();

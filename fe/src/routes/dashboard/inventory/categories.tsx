@@ -5,7 +5,6 @@ import { useId } from 'react'
 import {
   ChevronRight,
   FolderTree,
-  MoreVertical,
   Pencil,
   Plus,
   Search,
@@ -26,6 +25,8 @@ import { Input } from '#/components/ui/input'
 import { Label } from '#/components/ui/label'
 
 import { Select } from '#/components/ui/select'
+
+import { CategoriesTableSkeleton } from '#/hooks/SkelatonUi'
 
 import { useCategoriesCrudState } from '#/services/categories.service'
 
@@ -57,6 +58,8 @@ function InventoryCategoriesPage() {
     onAddSubmit,
     addName,
     setAddName,
+    addDescription,
+    setAddDescription,
     addSlug,
     editing,
     setEditing,
@@ -65,14 +68,14 @@ function InventoryCategoriesPage() {
     onEditSubmit,
     editName,
     setEditName,
+    editDescription,
+    setEditDescription,
     editSlug,
     deleting,
     setDeleting,
     deleteSubmitting,
     deleteError,
     confirmDelete,
-    menuRowId,
-    setMenuRowId,
     resetEditError,
   } = useCategoriesCrudState()
 
@@ -117,6 +120,16 @@ function InventoryCategoriesPage() {
                 value={addSlug}
                 placeholder="otomatis-dari-nama"
                 className="cursor-not-allowed bg-emerald-50/60 text-gray-600"
+              />
+            </div>
+            <div>
+              <Label htmlFor="category-description">Deskripsi</Label>
+              <Input
+                id="category-description"
+                name="description"
+                value={addDescription}
+                onChange={(e) => setAddDescription(e.target.value)}
+                placeholder="Contoh: Semua kebutuhan makanan untuk kucing"
               />
             </div>
             <div>
@@ -193,6 +206,16 @@ function InventoryCategoriesPage() {
                     value={editSlug}
                     placeholder="otomatis-dari-nama"
                     className="cursor-not-allowed bg-emerald-50/60 text-gray-600"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-category-description">Deskripsi</Label>
+                  <Input
+                    id="edit-category-description"
+                    name="description"
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                    placeholder="Contoh: Semua kebutuhan makanan untuk kucing"
                   />
                 </div>
                 <div>
@@ -283,6 +306,24 @@ function InventoryCategoriesPage() {
           </h1>
           <p className="mt-1 text-gray-500">
             Kelola kategori produk supaya pencarian dan grouping lebih rapi.
+            {!loading && items.length > 0 ? (
+              <span className="mt-2 block text-sm text-[#173a40]">
+                <span className="font-semibold text-emerald-600">
+                  {items.length}
+                </span>{' '}
+                kategori
+                {search.trim() ? (
+                  <>
+                    {' '}
+                    ·{' '}
+                    <span className="font-semibold text-emerald-600">
+                      {filtered.length}
+                    </span>{' '}
+                    cocok filter
+                  </>
+                ) : null}
+              </span>
+            ) : null}
           </p>
         </div>
         <button
@@ -326,116 +367,98 @@ function InventoryCategoriesPage() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[680px] text-left">
-            <thead>
-              <tr className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
-                <th className="px-4 py-3">Category Name</th>
-                <th className="px-4 py-3">Slug</th>
-                <th className="px-4 py-3">Updated</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-4 py-12 text-center text-sm text-gray-500"
-                  >
-                    Memuat kategori…
-                  </td>
+          {loading ? (
+            <CategoriesTableSkeleton rows={8} />
+          ) : (
+            <table className="w-full min-w-[680px] text-left">
+              <thead>
+                <tr className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
+                  <th className="px-4 py-3">Category Name</th>
+                  <th className="px-4 py-3">Description</th>
+                  <th className="px-4 py-3 tabular-nums">Products</th>
+                  <th className="px-4 py-3">Slug</th>
+                  <th className="px-4 py-3">Updated</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3 text-right">Action</th>
                 </tr>
-              ) : filtered.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-4 py-12 text-center text-sm text-gray-500"
-                  >
-                    {items.length === 0
-                      ? 'Belum ada kategori. Klik Add Category untuk menambahkan.'
-                      : 'Tidak ada kategori yang cocok dengan pencarian.'}
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((category) => (
-                  <tr
-                    key={category._id}
-                    className="border-t border-emerald-50 text-sm text-gray-700"
-                  >
-                    <td className="px-4 py-4 font-semibold text-[#173a40]">
-                      {category.name}
+              </thead>
+              <tbody>
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      className="px-4 py-12 text-center text-sm text-gray-500"
+                    >
+                      {items.length === 0
+                        ? 'Belum ada kategori. Klik Add Category untuk menambahkan.'
+                        : 'Tidak ada kategori yang cocok dengan pencarian.'}
                     </td>
-                    <td className="px-4 py-4 text-gray-500">{category.slug}</td>
-                    <td className="px-4 py-4 text-gray-500">
-                      {formatUpdatedAt(category.updatedAt)}
-                    </td>
-                    <td className="px-4 py-4">
-                      <span
-                        className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
-                          category.status === 'active'
-                            ? 'bg-emerald-50 text-emerald-600'
-                            : 'bg-gray-100 text-gray-500'
-                        }`}
-                      >
-                        {category.status === 'active' ? 'Active' : 'Inactive'}
-                      </span>
-                    </td>
-                    <td className="relative px-4 py-4 text-right">
-                      <button
-                        type="button"
-                        aria-expanded={menuRowId === category._id}
-                        aria-haspopup="true"
-                        aria-label="Aksi"
-                        onClick={(ev) => {
-                          ev.stopPropagation()
-                          setMenuRowId((id) =>
-                            id === category._id ? null : category._id,
-                          )
-                        }}
-                        className="rounded-lg p-1.5 text-gray-500 transition hover:bg-emerald-50 hover:text-emerald-600"
-                      >
-                        <MoreVertical size={16} />
-                      </button>
-                      {menuRowId === category._id ? (
-                        <div
-                          role="menu"
-                          className="absolute top-full right-4 z-20 mt-1 min-w-[160px] rounded-xl border border-emerald-100 bg-white py-1 shadow-lg"
-                          onClick={(ev) => ev.stopPropagation()}
+                  </tr>
+                ) : (
+                  filtered.map((category) => (
+                    <tr
+                      key={category._id}
+                      className="border-t border-emerald-50 text-sm text-gray-700"
+                    >
+                      <td className="px-4 py-4 font-semibold text-[#173a40]">
+                        {category.name}
+                      </td>
+                      <td className="max-w-xs px-4 py-4 text-gray-500">
+                        <p className="truncate">
+                          {category.description || '-'}
+                        </p>
+                      </td>
+                      <td className="px-4 py-4 tabular-nums">
+                        <span className="inline-flex min-w-10 justify-end font-semibold text-[#173a40]">
+                          {Number(category.count).toLocaleString()}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 text-gray-500">
+                        {category.slug}
+                      </td>
+                      <td className="px-4 py-4 text-gray-500">
+                        {formatUpdatedAt(category.updatedAt)}
+                      </td>
+                      <td className="px-4 py-4">
+                        <span
+                          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
+                            category.status === 'active'
+                              ? 'bg-emerald-50 text-emerald-600'
+                              : 'bg-gray-100 text-gray-500'
+                          }`}
                         >
+                          {category.status === 'active' ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <div className="inline-flex items-center justify-end gap-1">
                           <button
                             type="button"
-                            role="menuitem"
-                            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-emerald-50"
+                            aria-label={`Edit kategori ${category.name}`}
                             onClick={() => {
                               resetEditError()
                               setEditing(category)
-                              setMenuRowId(null)
                             }}
+                            className="rounded-lg p-2 text-gray-500 transition hover:bg-emerald-50 hover:text-emerald-600"
                           >
-                            <Pencil size={14} />
-                            Edit
+                            <Pencil size={18} strokeWidth={2} />
                           </button>
                           <button
                             type="button"
-                            role="menuitem"
-                            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
-                            onClick={() => {
-                              setDeleting(category)
-                              setMenuRowId(null)
-                            }}
+                            aria-label={`Hapus kategori ${category.name}`}
+                            onClick={() => setDeleting(category)}
+                            className="rounded-lg p-2 text-gray-500 transition hover:bg-red-50 hover:text-red-600"
                           >
-                            <Trash2 size={14} />
-                            Hapus
+                            <Trash2 size={18} strokeWidth={2} />
                           </button>
                         </div>
-                      ) : null}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </section>
     </div>

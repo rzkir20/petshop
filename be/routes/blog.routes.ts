@@ -3,10 +3,11 @@ import express from "express";
 import {
   create,
   getById,
+  getBySlug,
   list,
   remove,
   update,
-} from "../controllers/categories.controller";
+} from "../controllers/blog.controller";
 
 import { validateBody } from "../middlewares/validate";
 
@@ -15,14 +16,13 @@ import { slugPattern } from "../hooks/helper";
 const router = express.Router();
 
 router.get("/", list);
-
+router.get("/by-slug/:slug", getBySlug);
 router.get("/:id", getById);
 
 router.post(
   "/",
   validateBody({
-    name: { required: true, minLen: 1 },
-    description: { required: false, minLen: 1 },
+    title: { required: true, minLen: 1 },
     slug: {
       required: true,
       minLen: 1,
@@ -30,12 +30,17 @@ router.post(
       patternMessage:
         "slug must be lowercase letters, numbers, and single hyphens between segments",
     },
-    status: { required: false, oneOf: ["active", "inactive"] },
+    thumbnail: { required: false, minLen: 0 },
+    description: { required: false, minLen: 0 },
+    content: { required: true, minLen: 1 },
+    status: { required: false, oneOf: ["published", "draft"] },
+    category: { required: true, minLen: 1 },
   }),
   create,
 );
 
 router.patch("/:id", update);
+
 router.delete("/:id", remove);
 
 export default router;

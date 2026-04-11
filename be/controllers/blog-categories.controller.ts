@@ -1,55 +1,8 @@
 import { Request, Response } from "express";
 
 import * as BlogCategories from "../models/BlogCategories";
-import type { BlogCategoryStatus } from "../types/blog-categories";
 
-const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
-function parseUpdateBody(
-  body: unknown,
-): BlogCategories.UpdateBlogCategoryInput | null {
-  const b = (body || {}) as Record<string, unknown>;
-  const out: BlogCategories.UpdateBlogCategoryInput = {};
-
-  if ("name" in b) {
-    if (typeof b.name !== "string") {
-      return null;
-    }
-    out.name = b.name;
-  }
-  if ("slug" in b) {
-    if (typeof b.slug !== "string") {
-      return null;
-    }
-    out.slug = b.slug;
-  }
-  if ("status" in b) {
-    if (b.status !== "active" && b.status !== "inactive") {
-      return null;
-    }
-    out.status = b.status as BlogCategoryStatus;
-  }
-
-  if (
-    out.name === undefined &&
-    out.slug === undefined &&
-    out.status === undefined
-  ) {
-    return null;
-  }
-
-  if (out.name !== undefined && String(out.name).trim().length < 1) {
-    return null;
-  }
-  if (out.slug !== undefined) {
-    const s = String(out.slug).trim();
-    if (s.length < 1 || !SLUG_PATTERN.test(s.toLowerCase())) {
-      return null;
-    }
-  }
-
-  return out;
-}
+import { parseUpdateBlogCategoryBody } from "../hooks/helper";
 
 export async function list(_req: Request, res: Response) {
   try {
@@ -119,7 +72,7 @@ export async function create(req: Request, res: Response) {
 export async function update(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const parsed = parseUpdateBody(req.body);
+    const parsed = parseUpdateBlogCategoryBody(req.body);
     if (!parsed) {
       return res.status(400).json({
         message:

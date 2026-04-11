@@ -7,10 +7,13 @@ exports.findBySlug = findBySlug;
 exports.createCategory = createCategory;
 exports.updateCategory = updateCategory;
 exports.deleteCategory = deleteCategory;
+exports.incrementCategoryCount = incrementCategoryCount;
 exports.toPublic = toPublic;
 const mongoose_1 = require("mongoose");
 const categorySchema = new mongoose_1.Schema({
     name: { type: String, required: true, trim: true },
+    description: { type: String, trim: true, default: "" },
+    count: { type: Number, min: 0, default: 0 },
     slug: {
         type: String,
         required: true,
@@ -53,6 +56,7 @@ async function findBySlug(slug) {
 async function createCategory(input) {
     const created = await CategoryModel.create({
         name: String(input.name || "").trim(),
+        description: String(input.description || "").trim(),
         slug: normalizeSlug(input.slug),
         status: input.status === "inactive" ? "inactive" : "active",
     });
@@ -64,6 +68,9 @@ async function updateCategory(id, input) {
     const $set = {};
     if (input.name !== undefined) {
         $set.name = String(input.name || "").trim();
+    }
+    if (input.description !== undefined) {
+        $set.description = String(input.description || "").trim();
     }
     if (input.slug !== undefined) {
         $set.slug = normalizeSlug(input.slug);
@@ -83,12 +90,21 @@ async function deleteCategory(id) {
     const result = await CategoryModel.findByIdAndDelete(id);
     return result !== null;
 }
+async function incrementCategoryCount(slug, by = 1) {
+    const normalized = normalizeSlug(slug);
+    if (!normalized || by === 0)
+        return;
+    await CategoryModel.updateOne({ slug: normalized }, { $inc: { count: by } });
+    await CategoryModel.updateMany({ count: { $lt: 0 } }, { $set: { count: 0 } });
+}
 function toPublic(category) {
     if (!category)
         return null;
     return {
         _id: String(category._id || ""),
         name: category.name,
+        description: category.description,
+        count: Number(category.count || 0),
         slug: category.slug,
         status: category.status,
         createdAt: category.createdAt,

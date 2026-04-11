@@ -7,11 +7,11 @@ import {
   Types,
 } from "mongoose";
 
-import type { CategoryStatus } from "../types/categories";
-
 const categorySchema = new Schema(
   {
     name: { type: String, required: true, trim: true },
+    description: { type: String, trim: true, default: "" },
+    count: { type: Number, min: 0, default: 0 },
     slug: {
       type: String,
       required: true,
@@ -38,12 +38,14 @@ const CategoryModel =
 
 export type CreateCategoryInput = {
   name: string;
+  description?: string;
   slug: string;
   status?: CategoryStatus;
 };
 
 export type UpdateCategoryInput = {
   name?: string;
+  description?: string;
   slug?: string;
   status?: CategoryStatus;
 };
@@ -85,6 +87,7 @@ export async function createCategory(
 ): Promise<CategoryDocument> {
   const created = await CategoryModel.create({
     name: String(input.name || "").trim(),
+    description: String(input.description || "").trim(),
     slug: normalizeSlug(input.slug),
     status: input.status === "inactive" ? "inactive" : "active",
   });
@@ -100,6 +103,9 @@ export async function updateCategory(
   const $set: Record<string, unknown> = {};
   if (input.name !== undefined) {
     $set.name = String(input.name || "").trim();
+  }
+  if (input.description !== undefined) {
+    $set.description = String(input.description || "").trim();
   }
   if (input.slug !== undefined) {
     $set.slug = normalizeSlug(input.slug);
@@ -127,11 +133,23 @@ export async function deleteCategory(id: string): Promise<boolean> {
   return result !== null;
 }
 
+export async function incrementCategoryCount(
+  slug: string,
+  by = 1,
+): Promise<void> {
+  const normalized = normalizeSlug(slug);
+  if (!normalized || by === 0) return;
+  await CategoryModel.updateOne({ slug: normalized }, { $inc: { count: by } });
+  await CategoryModel.updateMany({ count: { $lt: 0 } }, { $set: { count: 0 } });
+}
+
 export function toPublic(category: CategoryDocument | null) {
   if (!category) return null;
   return {
     _id: String(category._id || ""),
     name: category.name,
+    description: category.description,
+    count: Number(category.count || 0),
     slug: category.slug,
     status: category.status as CategoryStatus,
     createdAt: category.createdAt,

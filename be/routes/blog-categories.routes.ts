@@ -7,11 +7,12 @@ import {
   remove,
   update,
 } from "../controllers/blog-categories.controller";
+
 import { validateBody } from "../middlewares/validate";
 
-const router = express.Router();
+import { slugPattern } from "../hooks/helper";
 
-const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const router = express.Router();
 
 router.get("/", list);
 router.get("/:id", getById);
@@ -33,6 +34,7 @@ router.post(
 );
 
 router.patch("/:id", update);
+
 router.delete("/:id", remove);
 
 export default router;

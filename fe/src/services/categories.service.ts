@@ -15,28 +15,29 @@ export const categoriesQueryKeys = {
 }
 
 const categoriesApi = createRestCrudResource<
-    Category,
-    CreateCategoryInput,
-    UpdateCategoryInput
+    CategoryItem,
+    CreateCategoryPayload,
+    UpdateCategoryPayload
 >({
     basePath: '/categories',
     listKey: 'categories',
     itemKey: 'category',
 })
 
-export async function listCategories(): Promise<Category[]> {
+export async function listCategories(): Promise<CategoryItem[]> {
     return categoriesApi.list()
 }
 
-export async function getCategory(id: string): Promise<Category> {
+export async function getCategory(id: string): Promise<CategoryItem> {
     return categoriesApi.get(id)
 }
 
 export async function createCategory(
-    input: CreateCategoryInput,
-): Promise<Category> {
+    input: CreateCategoryPayload,
+): Promise<CategoryItem> {
     return categoriesApi.create({
         name: input.name,
+        ...(input.description != null ? { description: input.description } : {}),
         slug: input.slug,
         ...(input.status != null ? { status: input.status } : {}),
     })
@@ -44,8 +45,8 @@ export async function createCategory(
 
 export async function updateCategory(
     id: string,
-    input: UpdateCategoryInput,
-): Promise<Category> {
+    input: UpdateCategoryPayload,
+): Promise<CategoryItem> {
     return categoriesApi.update(id, input)
 }
 
@@ -64,10 +65,11 @@ export function useCategoriesCrudState() {
     const [addOpen, setAddOpen] = useState(false)
     const [addFormKey, setAddFormKey] = useState(0)
     const [addName, setAddName] = useState('')
-    const [editing, setEditing] = useState<Category | null>(null)
+    const [addDescription, setAddDescription] = useState('')
+    const [editing, setEditing] = useState<CategoryItem | null>(null)
     const [editName, setEditName] = useState('')
+    const [editDescription, setEditDescription] = useState('')
     const [deleting, setDeleting] = useState<Category | null>(null)
-    const [menuRowId, setMenuRowId] = useState<string | null>(null)
 
     const categoriesQuery = useQuery({
         queryKey: categoriesQueryKeys.list(),
@@ -79,23 +81,25 @@ export function useCategoriesCrudState() {
     })
 
     const createMutation = useMutation({
-        mutationFn: async (input: CreateCategoryInput) => createCategory(input),
+        mutationFn: async (input: CreateCategoryPayload) => createCategory(input),
         onMutate: async (input) => {
             await queryClient.cancelQueries({ queryKey: categoriesQueryKeys.list() })
-            const previous = queryClient.getQueryData<Category[]>(
+            const previous = queryClient.getQueryData<CategoryItem[]>(
                 categoriesQueryKeys.list(),
             )
 
-            const optimistic: Category = {
+            const optimistic: CategoryItem = {
                 _id: `optimistic-${Math.random().toString(16).slice(2)}`,
                 name: input.name,
+                description: input.description ?? '',
+                count: 0,
                 slug: input.slug,
                 status: input.status ?? 'active',
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
             }
 
-            queryClient.setQueryData<Category[]>(
+            queryClient.setQueryData<CategoryItem[]>(
                 categoriesQueryKeys.list(),
                 (curr) => [optimistic, ...(curr ?? [])],
             )
@@ -119,15 +123,15 @@ export function useCategoriesCrudState() {
             input,
         }: {
             id: string
-            input: UpdateCategoryInput
+            input: UpdateCategoryPayload
         }) => updateCategory(id, input),
         onMutate: async ({ id, input }) => {
             await queryClient.cancelQueries({ queryKey: categoriesQueryKeys.list() })
-            const previous = queryClient.getQueryData<Category[]>(
+            const previous = queryClient.getQueryData<CategoryItem[]>(
                 categoriesQueryKeys.list(),
             )
 
-            queryClient.setQueryData<Category[]>(
+            queryClient.setQueryData<CategoryItem[]>(
                 categoriesQueryKeys.list(),
                 (curr) =>
                     (curr ?? []).map((c) =>
@@ -158,10 +162,10 @@ export function useCategoriesCrudState() {
         mutationFn: (id: string) => deleteCategory(id),
         onMutate: async (id) => {
             await queryClient.cancelQueries({ queryKey: categoriesQueryKeys.list() })
-            const previous = queryClient.getQueryData<Category[]>(
+            const previous = queryClient.getQueryData<CategoryItem[]>(
                 categoriesQueryKeys.list(),
             )
-            queryClient.setQueryData<Category[]>(
+            queryClient.setQueryData<CategoryItem[]>(
                 categoriesQueryKeys.list(),
                 (curr) => (curr ?? []).filter((c) => c._id !== id),
             )
@@ -194,6 +198,7 @@ export function useCategoriesCrudState() {
     useEffect(() => {
         if (!addOpen) return
         setAddName('')
+        setAddDescription('')
         resetCreateMutation()
     }, [addOpen, addFormKey, resetCreateMutation])
 
@@ -203,6 +208,7 @@ export function useCategoriesCrudState() {
             return
         }
         setEditName(editing.name)
+        setEditDescription(editing.description)
         resetUpdateMutation()
     }, [editing, resetUpdateMutation])
 
@@ -214,19 +220,14 @@ export function useCategoriesCrudState() {
         resetDeleteMutation()
     }, [deleting, resetDeleteMutation])
 
-    useEffect(() => {
-        if (!menuRowId) return
-        const onDocClick = () => setMenuRowId(null)
-        document.addEventListener('click', onDocClick)
-        return () => document.removeEventListener('click', onDocClick)
-    }, [menuRowId])
-
     const filtered = useMemo(() => {
         const q = search.trim().toLowerCase()
         if (!q) return items
         return items.filter(
             (c) =>
-                c.name.toLowerCase().includes(q) || c.slug.toLowerCase().includes(q),
+                c.name.toLowerCase().includes(q) ||
+                c.description.toLowerCase().includes(q) ||
+                c.slug.toLowerCase().includes(q),
         )
     }, [items, search])
 
@@ -241,10 +242,12 @@ export function useCategoriesCrudState() {
             e.preventDefault()
             const fd = new FormData(e.currentTarget)
             const name = String(fd.get('name') ?? '').trim()
+            const description = String(fd.get('description') ?? '').trim()
             const slug = String(fd.get('slug') ?? '').trim()
             const status = fd.get('status') as 'active' | 'inactive' | null
             createMutation.mutate({
                 name,
+                description,
                 slug,
                 status:
                     status === 'inactive'
@@ -263,9 +266,13 @@ export function useCategoriesCrudState() {
             if (!editing) return
             const fd = new FormData(e.currentTarget)
             const name = String(fd.get('name') ?? '').trim()
+            const description = String(fd.get('description') ?? '').trim()
             const slug = String(fd.get('slug') ?? '').trim()
             const status = fd.get('status') as 'active' | 'inactive'
-            updateMutation.mutate({ id: editing._id, input: { name, slug, status } })
+            updateMutation.mutate({
+                id: editing._id,
+                input: { name, description, slug, status },
+            })
         },
         [editing, updateMutation],
     )
@@ -305,6 +312,8 @@ export function useCategoriesCrudState() {
         onAddSubmit,
         addName,
         setAddName,
+        addDescription,
+        setAddDescription,
         addSlug,
         editing,
         setEditing,
@@ -313,14 +322,14 @@ export function useCategoriesCrudState() {
         onEditSubmit,
         editName,
         setEditName,
+        editDescription,
+        setEditDescription,
         editSlug,
         deleting,
         setDeleting,
         deleteSubmitting,
         deleteError,
         confirmDelete,
-        menuRowId,
-        setMenuRowId,
         resetEditError,
     }
 }

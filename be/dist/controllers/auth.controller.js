@@ -43,16 +43,7 @@ exports.session = session;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const Accounts = __importStar(require("../models/Accounts"));
 const password_1 = require("../utils/password");
-function getJwtCookieOptions() {
-    const isProduction = process.env.NODE_ENV === "production";
-    return {
-        httpOnly: true,
-        sameSite: isProduction ? "none" : "lax",
-        secure: isProduction,
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        path: "/",
-    };
-}
+const helper_1 = require("../hooks/helper");
 async function signup(req, res) {
     try {
         const { name, email, password, pictures } = (req.body || {});
@@ -79,7 +70,7 @@ async function signup(req, res) {
             email: publicUser?.email,
             name: publicUser?.name,
         }, secret, { expiresIn: "7d" });
-        res.cookie("session", token, getJwtCookieOptions());
+        res.cookie("session", token, (0, helper_1.getJwtCookieOptions)());
         return res.status(201).json({
             message: "Signup successful",
             user: publicUser,
@@ -113,7 +104,7 @@ async function signin(req, res) {
             email: publicUser?.email,
             name: publicUser?.name,
         }, secret, { expiresIn: "7d" });
-        res.cookie("session", token, getJwtCookieOptions());
+        res.cookie("session", token, (0, helper_1.getJwtCookieOptions)());
         return res.status(200).json({
             message: "Signin successful",
             user: publicUser,
@@ -125,7 +116,7 @@ async function signin(req, res) {
     }
 }
 function signout(_req, res) {
-    res.clearCookie("session", getJwtCookieOptions());
+    res.clearCookie("session", (0, helper_1.getJwtCookieOptions)());
     return res.status(200).json({ message: "Signout successful" });
 }
 async function session(req, res) {

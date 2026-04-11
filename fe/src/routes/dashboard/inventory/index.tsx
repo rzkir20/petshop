@@ -16,6 +16,8 @@ import { Button } from '#/components/ui/button'
 
 import { Empaty } from '#/components/ui/empaty'
 
+import { InventoryTableSkeleton } from '#/hooks/SkelatonUi'
+
 import {
   useProductsInventoryFiltersState,
   useProductsCrudMutations,
@@ -56,7 +58,7 @@ function statusLabel(s: StockStatus) {
 function InventoryPage() {
   const navigate = useNavigate()
   const filters = useProductsInventoryFiltersState()
-  const { products, error, refresh } = useProductsInventoryState({
+  const { products, loading, error, refresh } = useProductsInventoryState({
     category: filters.activeCategory,
     q: filters.searchQuery,
   })
@@ -229,7 +231,9 @@ function InventoryPage() {
           ) : null}
 
           <div className="overflow-x-auto">
-            {products.length === 0 ? (
+            {loading ? (
+              <InventoryTableSkeleton rows={8} />
+            ) : products.length === 0 ? (
               <Empaty
                 title="Produk tidak ditemukan"
                 description="Coba ubah kata kunci pencarian atau pilih kategori lain."

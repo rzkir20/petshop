@@ -1,14 +1,5 @@
 import { InferSchemaType, Model, model, models, Schema, Types } from "mongoose";
 
-type AccountBase = {
-  name: string;
-  email: string;
-  password: string;
-  pictures: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
 const accountSchema = new Schema(
   {
     name: { type: String, required: true, trim: true },
@@ -19,18 +10,9 @@ const accountSchema = new Schema(
   { timestamps: true, collection: "accounts" },
 );
 
-type AccountDocument = InferSchemaType<typeof accountSchema> & { _id?: Types.ObjectId };
-
 const AccountModel =
   (models.Account as Model<InferSchemaType<typeof accountSchema>>) ||
   model("Account", accountSchema);
-
-type CreateAccountInput = {
-  name: string;
-  email: string;
-  password: string;
-  pictures?: string;
-};
 
 function normalizeEmail(email: string): string {
   return String(email || "")

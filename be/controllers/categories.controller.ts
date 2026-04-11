@@ -1,53 +1,8 @@
 import { Request, Response } from "express";
 
 import * as Categories from "../models/Categories";
-import type { CategoryStatus } from "../types/categories";
 
-const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
-function parseUpdateBody(body: unknown): Categories.UpdateCategoryInput | null {
-  const b = (body || {}) as Record<string, unknown>;
-  const out: Categories.UpdateCategoryInput = {};
-
-  if ("name" in b) {
-    if (typeof b.name !== "string") {
-      return null;
-    }
-    out.name = b.name;
-  }
-  if ("slug" in b) {
-    if (typeof b.slug !== "string") {
-      return null;
-    }
-    out.slug = b.slug;
-  }
-  if ("status" in b) {
-    if (b.status !== "active" && b.status !== "inactive") {
-      return null;
-    }
-    out.status = b.status as CategoryStatus;
-  }
-
-  if (
-    out.name === undefined &&
-    out.slug === undefined &&
-    out.status === undefined
-  ) {
-    return null;
-  }
-
-  if (out.name !== undefined && String(out.name).trim().length < 1) {
-    return null;
-  }
-  if (out.slug !== undefined) {
-    const s = String(out.slug).trim();
-    if (s.length < 1 || !SLUG_PATTERN.test(s.toLowerCase())) {
-      return null;
-    }
-  }
-
-  return out;
-}
+import { parseUpdateCategoryBody } from "../hooks/helper";
 
 export async function list(_req: Request, res: Response) {
   try {
@@ -79,14 +34,16 @@ export async function getById(req: Request, res: Response) {
 export async function create(req: Request, res: Response) {
   try {
     await Categories.ensureIndexes();
-    const { name, slug, status } = (req.body || {}) as {
+    const { name, description, slug, status } = (req.body || {}) as {
       name?: string;
+      description?: string;
       slug?: string;
       status?: string;
     };
 
     const row = await Categories.createCategory({
       name: String(name || ""),
+      description: String(description || ""),
       slug: String(slug || ""),
       status:
         status === "inactive"
@@ -117,11 +74,11 @@ export async function create(req: Request, res: Response) {
 export async function update(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const parsed = parseUpdateBody(req.body);
+    const parsed = parseUpdateCategoryBody(req.body);
     if (!parsed) {
       return res.status(400).json({
         message:
-          "Provide at least one valid field: name (non-empty), slug (valid format), or status (active|inactive)",
+          "Provide at least one valid field: name (non-empty), description (string), slug (valid format), or status (active|inactive)",
       });
     }
 

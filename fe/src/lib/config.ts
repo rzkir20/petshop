@@ -1,6 +1,3 @@
-// const rawApiBaseUrl = "http://localhost:3001"
-const rawApiBaseUrl = "https://petshop.spacedigitalia.biz.id"
-
 function normalizeApiBaseUrl(value: unknown): string {
   if (typeof value !== 'string') return ''
 
@@ -15,7 +12,7 @@ function normalizeApiBaseUrl(value: unknown): string {
   return normalized.replace(/\/$/, '')
 }
 
-export const API_BASE_URL = normalizeApiBaseUrl(rawApiBaseUrl)
+export const API_BASE_URL = normalizeApiBaseUrl("https://petshop.spacedigitalia.biz.id")
 
 export const STORAGE_KEYS = {
   token: 'petshop:token',

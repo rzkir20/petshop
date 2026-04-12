@@ -1,83 +1,156 @@
-import { PawPrint } from 'lucide-react'
+import { Lightbulb, PawPrint, Sparkles } from 'lucide-react'
+
+import { useLayoutEffect, useRef, useState } from 'react'
+
+import {
+  LOADING_SCREEN_DOCUMENT_TITLE,
+  LOADING_SCREEN_PROGRESS_MS,
+} from '#/lib/loading-screen'
+
+import { defaultTip, DecorativePaws, STATUS_STAGES } from './helper'
 
 import { cn } from '#/lib/utils'
 
-type LoadingScreenProps = {
-  className?: string
-  message?: string
-  subMessage?: string
-}
+const LAST_STAGE = STATUS_STAGES[STATUS_STAGES.length - 1]
+
+const LAST_STAGE_INDEX = STATUS_STAGES.length - 1
 
 export function LoadingScreen({
   className,
-  message = 'Loading…',
-  subMessage = 'Getting everything ready for you and your pets',
+  message = 'Dashboard is waking up',
+  subMessage,
 }: LoadingScreenProps) {
+  const [progress, setProgress] = useState(0)
+  const rafRef = useRef(0)
+
+  useLayoutEffect(() => {
+    const previousTitle = document.title
+    document.title = LOADING_SCREEN_DOCUMENT_TITLE
+
+    const start = performance.now()
+    const durationMs = LOADING_SCREEN_PROGRESS_MS
+
+    const tick = () => {
+      const elapsed = performance.now() - start
+      const linear = Math.min(1, elapsed / durationMs)
+      const eased = 1 - (1 - linear) ** 2.4
+      setProgress(linear >= 1 ? 100 : eased * 100)
+      if (linear < 1) rafRef.current = requestAnimationFrame(tick)
+    }
+
+    rafRef.current = requestAnimationFrame(tick)
+
+    return () => {
+      cancelAnimationFrame(rafRef.current)
+      document.title = previousTitle
+    }
+  }, [])
+
+  const complete = progress >= 100
+  const stageIndex = Math.min(
+    LAST_STAGE_INDEX,
+    Math.floor((Math.min(progress, 99.99) / 100) * LAST_STAGE_INDEX),
+  )
+  const status = complete
+    ? { label: 'Ready!' as const, detail: LAST_STAGE.detail }
+    : STATUS_STAGES[stageIndex]
+
+  const pct = Math.floor(progress)
+
+  const cardClass =
+    'relative w-full max-w-md overflow-hidden rounded-[48px] border border-white/40 bg-white/60 p-12 text-center shadow-[0_20px_40px_-10px_rgba(16,185,129,0.1)] backdrop-blur-md'
+
   return (
     <div
       className={cn(
-        'relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-white text-slate-900',
+        'flex min-h-screen w-full items-center justify-center overflow-hidden bg-linear-to-br from-[#f3faf5] to-[#e7f0e8] p-6 font-sans text-[#173a40]',
         className,
       )}
       role="status"
       aria-live="polite"
       aria-busy="true"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={pct}
     >
-      <div
-        className="pointer-events-none absolute -top-40 left-[10%] h-112 w-mdrounded-full bg-emerald-200/45 blur-3xl"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute -right-20 -bottom-32 h-88 w-88 rounded-full bg-orange-200/40 blur-3xl"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute top-1/2 left-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-teal-100/30 blur-3xl"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-0 hero-gradient"
-        aria-hidden
-      />
+      <div className={cardClass}>
+        <DecorativePaws />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-md flex-col items-center gap-20 px-6">
-        <div className="flex flex-col items-center gap-6 sm:flex-row sm:gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-xl shadow-emerald-200/90">
-            <PawPrint size={28} strokeWidth={2.2} aria-hidden />
+        <div className="relative mx-auto flex flex-col items-center space-y-8">
+          <div className="relative shrink-0">
+            <div className="loading-paw-bounce flex h-24 w-24 items-center justify-center rounded-[32px] bg-white shadow-xl shadow-emerald-500/10">
+              <PawPrint
+                className="size-12 text-emerald-500"
+                strokeWidth={2}
+                aria-hidden
+              />
+            </div>
+            <Sparkles
+              className="absolute -top-2 -right-2 size-7 text-[#ff6b35] animate-pulse"
+              aria-hidden
+            />
           </div>
-          <div className="text-center sm:text-left">
-            <p className="font-display text-3xl font-bold tracking-tight text-slate-800 sm:text-4xl">
-              Pawsome<span className="text-emerald-500">Shop</span>
+
+          <div className="space-y-2">
+            <h1 className="font-display text-4xl font-bold tracking-tight text-[#173a40]">
+              Pawsome Shop
+            </h1>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <span className="text-sm font-medium text-gray-400">
+                {message}
+              </span>
+              <div className="flex gap-1" aria-hidden>
+                <span className="loading-dot-bounce loading-dot-bounce-delay-1" />
+                <span className="loading-dot-bounce loading-dot-bounce-delay-2" />
+                <span className="loading-dot-bounce" />
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full space-y-4 pt-4">
+            <div className="flex items-end justify-between px-1">
+              <span
+                className={cn(
+                  'text-[11px] font-bold tracking-widest uppercase transition-colors duration-500',
+                  complete ? 'text-[#ff6b35]' : 'text-emerald-500',
+                )}
+              >
+                {status.label}
+              </span>
+              <span className="text-lg font-bold text-[#173a40]">{pct}%</span>
+            </div>
+
+            <div className="mx-auto h-2 w-[min(100%,300px)] overflow-hidden rounded-full bg-emerald-500/10">
+              <div
+                className="relative h-full w-full origin-left rounded-full bg-emerald-500 will-change-transform"
+                style={{
+                  transform: `scaleX(${Math.max(0.02, pct / 100)})`,
+                  transition: 'transform 120ms ease-out',
+                }}
+              >
+                <span
+                  className="loading-shine pointer-events-none absolute inset-0 bg-linear-to-r from-transparent via-white/40 to-transparent"
+                  aria-hidden
+                />
+              </div>
+            </div>
+
+            <p className="text-xs text-gray-400 italic transition-opacity duration-300">
+              {status.detail}
             </p>
-            <p className="mt-1 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-600">
-              Premium pet supplies & care
-            </p>
-          </div>
-        </div>
-
-        <div className="flex flex-col items-center gap-8">
-          <div
-            className="relative flex h-18 w-18 items-center justify-center"
-            aria-hidden
-          >
-            <div className="absolute inset-0 rounded-full border-[3px] border-emerald-100" />
-            <div className="absolute inset-0 animate-[spin_0.85s_linear_infinite] rounded-full border-[3px] border-transparent border-t-emerald-500 border-r-orange-400" />
-            <div className="absolute inset-2 rounded-full border-2 border-emerald-50/80" />
-            <div className="absolute inset-2 animate-[spin_1.25s_linear_infinite_reverse] rounded-full border-2 border-transparent border-b-teal-400/70 border-l-emerald-300/50" />
           </div>
 
-          <div className="flex gap-1.5" aria-hidden>
-            <span className="h-2 w-2 animate-bounce rounded-full bg-emerald-400" />
-            <span className="h-2 w-2 animate-bounce rounded-full bg-emerald-500 delay-150" />
-            <span className="h-2 w-2 animate-bounce rounded-full bg-orange-400 delay-300" />
+          <div className="w-full pt-4">
+            <div className="flex items-center gap-3 rounded-2xl border border-emerald-100/50 bg-emerald-50 px-6 py-3 text-left">
+              <Lightbulb
+                className="size-5 shrink-0 text-[#ff6b35]"
+                aria-hidden
+              />
+              <p className="text-[10px] leading-tight font-medium text-emerald-800">
+                {subMessage ?? defaultTip}
+              </p>
+            </div>
           </div>
-        </div>
-
-        <div className="space-y-2 text-center">
-          <p className="font-display text-lg font-semibold text-slate-800">
-            {message}
-          </p>
-          <p className="text-sm leading-relaxed text-slate-500">{subMessage}</p>
         </div>
       </div>
     </div>

@@ -5,7 +5,7 @@ import {
   redirect,
   useLocation,
 } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import MainNav from '#/components/MainNav'
 
@@ -14,6 +14,8 @@ import Sidebar from '#/components/Sidebar'
 import { LoadingScreen } from '#/components/ui/LoadingScreen'
 
 import { useAuth } from '#/context/AuthContext'
+
+import { LOADING_SCREEN_PROGRESS_MS } from '#/lib/loading-screen'
 
 import { getSession } from '#/services/auth.service'
 
@@ -24,7 +26,7 @@ export const Route = createFileRoute('/dashboard')({
     try {
       await getSession()
     } catch {
-      throw redirect({ to: '/signin' })
+      throw redirect({ to: '/signin', search: { reauth: undefined } })
     }
   },
   component: DashboardLayout,
@@ -34,9 +36,21 @@ function DashboardLayout() {
   const { status } = useAuth()
   const { pathname } = useLocation()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [minLoaderElapsed, setMinLoaderElapsed] = useState(false)
 
-  if (status === 'loading') return <LoadingScreen />
-  if (status === 'anonymous') return <Navigate to="/signin" />
+  useEffect(() => {
+    const id = window.setTimeout(
+      () => setMinLoaderElapsed(true),
+      LOADING_SCREEN_PROGRESS_MS,
+    )
+    return () => window.clearTimeout(id)
+  }, [])
+
+  if (status === 'anonymous')
+    return <Navigate to="/signin" search={{ reauth: undefined }} replace />
+
+  const showLoader = status === 'loading' || !minLoaderElapsed
+  if (showLoader) return <LoadingScreen />
 
   const activeItem = pathname.startsWith('/dashboard/analytics')
     ? 'analytics'
@@ -46,9 +60,19 @@ function DashboardLayout() {
         ? 'inventory-category'
         : pathname.startsWith('/dashboard/inventory')
           ? 'inventory-post'
-          : pathname.startsWith('/dashboard/costumers')
-            ? 'customers'
-            : 'dashboard'
+          : pathname.startsWith('/dashboard/blog/categories')
+            ? 'blog-category'
+            : pathname.startsWith('/dashboard/blog')
+              ? 'blog-post'
+              : pathname.startsWith('/dashboard/costumers')
+                ? 'customers'
+                : pathname.startsWith('/dashboard/testimonials')
+                  ? 'testimonials'
+                  : pathname.startsWith('/dashboard/support')
+                    ? 'support'
+                    : pathname.startsWith('/dashboard/settings')
+                      ? 'settings'
+                      : 'dashboard'
 
   return (
     <div className="min-h-screen bg-[#f3faf5] text-[#173a40]">

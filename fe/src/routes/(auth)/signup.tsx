@@ -7,6 +7,8 @@ import {
 
 import {
   CheckCircle2,
+  Eye,
+  EyeOff,
   LockKeyhole,
   Mail,
   PawPrint,
@@ -16,7 +18,10 @@ import React, { useId, useState } from 'react'
 
 import { useAuth } from '../../context/AuthContext'
 
-import { getSession } from '../../services/auth.service'
+import {
+  getSession,
+  usePasswordFieldVisibility,
+} from '../../services/auth.service'
 
 export const Route = createFileRoute('/(auth)/signup')({
   beforeLoad: async () => {
@@ -44,6 +49,7 @@ function SignUpPage() {
   })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const passwordField = usePasswordFieldVisibility()
 
   if (status === 'loading') return null
   if (status === 'authenticated') return <Navigate to="/dashboard" />
@@ -66,13 +72,13 @@ function SignUpPage() {
     setSubmitting(true)
     try {
       await signup({
-        name: form.name,
-        email: form.email,
-        password: form.password,
+        name: form.name.trim(),
+        email: form.email.trim(),
+        password: form.password.trim(),
       })
       await navigate({ to: '/dashboard' })
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Signup failed')
+    } catch {
+      // Pesan error dari AuthContext (react-hot-toast)
     } finally {
       setSubmitting(false)
     }
@@ -173,13 +179,13 @@ function SignUpPage() {
                 >
                   Password
                 </label>
-                <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-4">
-                  <LockKeyhole className="h-4 w-4 text-slate-400" />
+                <div className="flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-4">
+                  <LockKeyhole className="h-4 w-4 shrink-0 text-slate-400" />
                   <input
                     id="password"
-                    type="password"
+                    type={passwordField.inputType}
                     placeholder="Create a secure password"
-                    className="w-full border-none bg-transparent px-3 py-3.5 outline-none"
+                    className="min-w-0 flex-1 border-none bg-transparent px-2 py-3.5 outline-none"
                     value={form.password}
                     onChange={(e) =>
                       setForm((prev) => ({ ...prev, password: e.target.value }))
@@ -188,6 +194,22 @@ function SignUpPage() {
                     minLength={6}
                     required
                   />
+                  <button
+                    type="button"
+                    className="shrink-0 p-1 text-slate-400 hover:text-slate-600"
+                    onClick={passwordField.toggleVisibility}
+                    aria-label={
+                      passwordField.visible
+                        ? 'Sembunyikan kata sandi'
+                        : 'Tampilkan kata sandi'
+                    }
+                  >
+                    {passwordField.visible ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
                 </div>
                 <p className="text-xs text-slate-400">
                   Use at least 8 characters with letters and numbers.

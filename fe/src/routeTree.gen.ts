@@ -27,11 +27,13 @@ import { Route as ShopSlugRouteImport } from './routes/shop/$slug'
 import { Route as RulesTermsRouteImport } from './routes/rules/terms'
 import { Route as RulesPrivacyPolicyRouteImport } from './routes/rules/privacy-policy'
 import { Route as RulesCookiesRouteImport } from './routes/rules/cookies'
+import { Route as DashboardTestimonialsRouteImport } from './routes/dashboard/testimonials'
+import { Route as DashboardSupportRouteImport } from './routes/dashboard/support'
+import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as CategoriesSlugRouteImport } from './routes/categories/$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as authSignupRouteImport } from './routes/(auth)/signup'
 import { Route as authSigninRouteImport } from './routes/(auth)/signin'
-import { Route as DashboardSettingsIndexRouteImport } from './routes/dashboard/settings/index'
 import { Route as DashboardOrdersIndexRouteImport } from './routes/dashboard/orders/index'
 import { Route as DashboardInventoryIndexRouteImport } from './routes/dashboard/inventory/index'
 import { Route as DashboardCostumersIndexRouteImport } from './routes/dashboard/costumers/index'
@@ -135,6 +137,21 @@ const RulesCookiesRoute = RulesCookiesRouteImport.update({
   path: '/rules/cookies',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardTestimonialsRoute = DashboardTestimonialsRouteImport.update({
+  id: '/testimonials',
+  path: '/testimonials',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardSupportRoute = DashboardSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
   id: '/categories/$slug',
   path: '/categories/$slug',
@@ -154,11 +171,6 @@ const authSigninRoute = authSigninRouteImport.update({
   id: '/(auth)/signin',
   path: '/signin',
   getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardSettingsIndexRoute = DashboardSettingsIndexRouteImport.update({
-  id: '/settings/',
-  path: '/settings/',
-  getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardOrdersIndexRoute = DashboardOrdersIndexRouteImport.update({
   id: '/orders/',
@@ -239,6 +251,9 @@ export interface FileRoutesByFullPath {
   '/signup': typeof authSignupRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/support': typeof DashboardSupportRoute
+  '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/rules/cookies': typeof RulesCookiesRoute
   '/rules/privacy-policy': typeof RulesPrivacyPolicyRoute
   '/rules/terms': typeof RulesTermsRoute
@@ -259,7 +274,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/costumers/': typeof DashboardCostumersIndexRoute
   '/dashboard/inventory/': typeof DashboardInventoryIndexRoute
   '/dashboard/orders/': typeof DashboardOrdersIndexRoute
-  '/dashboard/settings/': typeof DashboardSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -275,6 +289,9 @@ export interface FileRoutesByTo {
   '/signup': typeof authSignupRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/support': typeof DashboardSupportRoute
+  '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/rules/cookies': typeof RulesCookiesRoute
   '/rules/privacy-policy': typeof RulesPrivacyPolicyRoute
   '/rules/terms': typeof RulesTermsRoute
@@ -295,7 +312,6 @@ export interface FileRoutesByTo {
   '/dashboard/costumers': typeof DashboardCostumersIndexRoute
   '/dashboard/inventory': typeof DashboardInventoryIndexRoute
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
-  '/dashboard/settings': typeof DashboardSettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -313,6 +329,9 @@ export interface FileRoutesById {
   '/(auth)/signup': typeof authSignupRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/support': typeof DashboardSupportRoute
+  '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/rules/cookies': typeof RulesCookiesRoute
   '/rules/privacy-policy': typeof RulesPrivacyPolicyRoute
   '/rules/terms': typeof RulesTermsRoute
@@ -333,7 +352,6 @@ export interface FileRoutesById {
   '/dashboard/costumers/': typeof DashboardCostumersIndexRoute
   '/dashboard/inventory/': typeof DashboardInventoryIndexRoute
   '/dashboard/orders/': typeof DashboardOrdersIndexRoute
-  '/dashboard/settings/': typeof DashboardSettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -352,6 +370,9 @@ export interface FileRouteTypes {
     | '/signup'
     | '/blog/$slug'
     | '/categories/$slug'
+    | '/dashboard/settings'
+    | '/dashboard/support'
+    | '/dashboard/testimonials'
     | '/rules/cookies'
     | '/rules/privacy-policy'
     | '/rules/terms'
@@ -372,7 +393,6 @@ export interface FileRouteTypes {
     | '/dashboard/costumers/'
     | '/dashboard/inventory/'
     | '/dashboard/orders/'
-    | '/dashboard/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -388,6 +408,9 @@ export interface FileRouteTypes {
     | '/signup'
     | '/blog/$slug'
     | '/categories/$slug'
+    | '/dashboard/settings'
+    | '/dashboard/support'
+    | '/dashboard/testimonials'
     | '/rules/cookies'
     | '/rules/privacy-policy'
     | '/rules/terms'
@@ -408,7 +431,6 @@ export interface FileRouteTypes {
     | '/dashboard/costumers'
     | '/dashboard/inventory'
     | '/dashboard/orders'
-    | '/dashboard/settings'
   id:
     | '__root__'
     | '/'
@@ -425,6 +447,9 @@ export interface FileRouteTypes {
     | '/(auth)/signup'
     | '/blog/$slug'
     | '/categories/$slug'
+    | '/dashboard/settings'
+    | '/dashboard/support'
+    | '/dashboard/testimonials'
     | '/rules/cookies'
     | '/rules/privacy-policy'
     | '/rules/terms'
@@ -445,7 +470,6 @@ export interface FileRouteTypes {
     | '/dashboard/costumers/'
     | '/dashboard/inventory/'
     | '/dashboard/orders/'
-    | '/dashboard/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -600,6 +624,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RulesCookiesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/testimonials': {
+      id: '/dashboard/testimonials'
+      path: '/testimonials'
+      fullPath: '/dashboard/testimonials'
+      preLoaderRoute: typeof DashboardTestimonialsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/support': {
+      id: '/dashboard/support'
+      path: '/support'
+      fullPath: '/dashboard/support'
+      preLoaderRoute: typeof DashboardSupportRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/settings': {
+      id: '/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/categories/$slug': {
       id: '/categories/$slug'
       path: '/categories/$slug'
@@ -627,13 +672,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/signin'
       preLoaderRoute: typeof authSigninRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/settings/': {
-      id: '/dashboard/settings/'
-      path: '/settings'
-      fullPath: '/dashboard/settings/'
-      preLoaderRoute: typeof DashboardSettingsIndexRouteImport
-      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/orders/': {
       id: '/dashboard/orders/'
@@ -723,6 +761,9 @@ declare module '@tanstack/react-router' {
 }
 
 interface DashboardRouteRouteChildren {
+  DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardSupportRoute: typeof DashboardSupportRoute
+  DashboardTestimonialsRoute: typeof DashboardTestimonialsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardBlogIdRoute: typeof DashboardBlogIdRoute
   DashboardBlogCategoriesRoute: typeof DashboardBlogCategoriesRoute
@@ -736,10 +777,12 @@ interface DashboardRouteRouteChildren {
   DashboardCostumersIndexRoute: typeof DashboardCostumersIndexRoute
   DashboardInventoryIndexRoute: typeof DashboardInventoryIndexRoute
   DashboardOrdersIndexRoute: typeof DashboardOrdersIndexRoute
-  DashboardSettingsIndexRoute: typeof DashboardSettingsIndexRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardSupportRoute: DashboardSupportRoute,
+  DashboardTestimonialsRoute: DashboardTestimonialsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardBlogIdRoute: DashboardBlogIdRoute,
   DashboardBlogCategoriesRoute: DashboardBlogCategoriesRoute,
@@ -753,7 +796,6 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardCostumersIndexRoute: DashboardCostumersIndexRoute,
   DashboardInventoryIndexRoute: DashboardInventoryIndexRoute,
   DashboardOrdersIndexRoute: DashboardOrdersIndexRoute,
-  DashboardSettingsIndexRoute: DashboardSettingsIndexRoute,
 }
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(

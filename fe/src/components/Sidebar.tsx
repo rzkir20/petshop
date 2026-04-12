@@ -9,6 +9,7 @@ import {
   PawPrint,
   Settings,
   ShoppingBag,
+  Star,
   Users2,
 } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
@@ -67,6 +68,12 @@ const mainMenuItems: SidebarItem[] = [
     ],
   },
   {
+    id: 'testimonials',
+    label: 'Testimonials',
+    icon: Star,
+    to: '/dashboard/testimonials',
+  },
+  {
     id: 'customers',
     label: 'Customers',
     icon: Users2,
@@ -81,7 +88,12 @@ const accountItems: SidebarItem[] = [
     icon: Settings,
     href: '/dashboard/settings',
   },
-  { id: 'support', label: 'Support', icon: HelpCircle, href: '#support' },
+  {
+    id: 'support',
+    label: 'Support',
+    icon: HelpCircle,
+    href: '/dashboard/support',
+  },
 ]
 
 export default function Sidebar({

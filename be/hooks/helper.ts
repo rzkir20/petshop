@@ -1,5 +1,11 @@
 import imagekit, { isImageKitConfigured } from "../utils/imgkit";
 
+import { Request, Response } from "express";
+
+import jwt from "jsonwebtoken";
+
+import * as Accounts from "../models/Accounts";
+
 //================================= Slug Pattern =================================
 export const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -15,6 +21,47 @@ export function getJwtCookieOptions() {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         path: "/",
     };
+}
+
+export function getJwtClearCookieOptions() {
+    const o = getJwtCookieOptions();
+    return {
+        httpOnly: o.httpOnly,
+        sameSite: o.sameSite,
+        secure: o.secure,
+        path: o.path,
+    };
+}
+
+export function getAuthenticatedUserId(req: Request): string | null {
+    const token = req.cookies?.session as string | undefined;
+    const secret = process.env.JWT_SECRET;
+    if (!token || !secret) return null;
+    try {
+        const payload = jwt.verify(token, secret) as { sub?: string };
+        const id = payload.sub != null ? String(payload.sub) : "";
+        return id || null;
+    } catch {
+        return null;
+    }
+}
+
+export function issueSessionCookie(
+    res: Response,
+    publicUser: NonNullable<ReturnType<typeof Accounts.toPublic>>,
+): void {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) return;
+    const token = jwt.sign(
+        {
+            sub: publicUser._id,
+            email: publicUser.email,
+            name: publicUser.name,
+        },
+        secret,
+        { expiresIn: "7d" },
+    );
+    res.cookie("session", token, getJwtCookieOptions());
 }
 
 //================================= Parse Update Body =================================//

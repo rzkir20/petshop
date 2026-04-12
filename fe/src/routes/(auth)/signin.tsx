@@ -7,6 +7,8 @@ import {
 
 import {
   CheckCircle2,
+  Eye,
+  EyeOff,
   LockKeyhole,
   Mail,
   PawPrint,
@@ -15,10 +17,19 @@ import {
 import React, { useId, useState } from 'react'
 
 import { useAuth } from '../../context/AuthContext'
-import { getSession } from '../../services/auth.service'
+
+import {
+  getSession,
+  usePasswordFieldVisibility,
+} from '../../services/auth.service'
 
 export const Route = createFileRoute('/(auth)/signin')({
-  beforeLoad: async () => {
+  validateSearch: (search: Record<string, unknown>) => ({
+    reauth: search.reauth === '1' ? ('1' as const) : undefined,
+  }),
+  beforeLoad: async ({ search }) => {
+    // After password change we force re-login; skip "already logged in" redirect.
+    if (search.reauth === '1') return
     try {
       await getSession()
     } catch {
@@ -41,6 +52,7 @@ function SignInPage() {
   })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const passwordField = usePasswordFieldVisibility()
 
   if (status === 'loading') return null
   if (status === 'authenticated') return <Navigate to="/dashboard" />
@@ -58,12 +70,12 @@ function SignInPage() {
 
     try {
       await signin({
-        email: form.email,
-        password: form.password,
+        email: form.email.trim(),
+        password: form.password.trim(),
       })
       await navigate({ to: '/dashboard' })
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Signin failed')
+    } catch {
+      // Pesan error dari AuthContext (react-hot-toast)
     } finally {
       setSubmitting(false)
     }
@@ -148,13 +160,13 @@ function SignInPage() {
                 >
                   Password
                 </label>
-                <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-4">
-                  <LockKeyhole className="h-4 w-4 text-slate-400" />
+                <div className="flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-4">
+                  <LockKeyhole className="h-4 w-4 shrink-0 text-slate-400" />
                   <input
                     id="password"
-                    type="password"
+                    type={passwordField.inputType}
                     placeholder="Enter your password"
-                    className="w-full border-none bg-transparent px-3 py-3.5 outline-none"
+                    className="min-w-0 flex-1 border-none bg-transparent px-2 py-3.5 outline-none"
                     value={form.password}
                     onChange={(e) =>
                       setForm((prev) => ({ ...prev, password: e.target.value }))
@@ -162,6 +174,22 @@ function SignInPage() {
                     autoComplete="current-password"
                     required
                   />
+                  <button
+                    type="button"
+                    className="shrink-0 p-1 text-slate-400 hover:text-slate-600"
+                    onClick={passwordField.toggleVisibility}
+                    aria-label={
+                      passwordField.visible
+                        ? 'Sembunyikan kata sandi'
+                        : 'Tampilkan kata sandi'
+                    }
+                  >
+                    {passwordField.visible ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
                 </div>
               </div>
 
@@ -172,7 +200,10 @@ function SignInPage() {
                     className="h-4 w-4 rounded border-slate-300 text-emerald-500"
                     checked={form.remember}
                     onChange={(e) =>
-                      setForm((prev) => ({ ...prev, remember: e.target.checked }))
+                      setForm((prev) => ({
+                        ...prev,
+                        remember: e.target.checked,
+                      }))
                     }
                   />
                   Remember me

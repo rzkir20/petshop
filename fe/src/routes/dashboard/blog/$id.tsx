@@ -136,7 +136,7 @@ function RouteComponent() {
               update.mutate(form.updateVariables, {
                 onSuccess: () => {
                   form.clearThumbnailFile()
-                  void postQuery.refetch()
+                  void navigate({ to: '/dashboard/blog' })
                 },
               })
             }}

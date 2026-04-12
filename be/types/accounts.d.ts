@@ -4,6 +4,7 @@ interface Account {
   email: string;
   password: string;
   pictures: string;
+  phone: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -13,6 +14,7 @@ type AccountBase = {
   email: string;
   password: string;
   pictures: string;
+  phone: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -24,4 +26,5 @@ type CreateAccountInput = {
   email: string;
   password: string;
   pictures?: string;
+  phone?: string;
 };

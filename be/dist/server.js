@@ -12,6 +12,8 @@ const blog_categories_routes_1 = __importDefault(require("./routes/blog-categori
 const blog_routes_1 = __importDefault(require("./routes/blog.routes"));
 const categories_routes_1 = __importDefault(require("./routes/categories.routes"));
 const products_routes_1 = __importDefault(require("./routes/products.routes"));
+const store_information_routes_1 = __importDefault(require("./routes/store-information.routes"));
+const testimonials_routes_1 = __importDefault(require("./routes/testimonials.routes"));
 const mongodb_1 = require("./utils/mongodb");
 const app = (0, express_1.default)();
 const corsOrigin = process.env.CORS_ORIGIN;
@@ -30,6 +32,8 @@ app.use("/blog-categories", blog_categories_routes_1.default);
 app.use("/blogs", blog_routes_1.default);
 app.use("/categories", categories_routes_1.default);
 app.use("/products", products_routes_1.default);
+app.use("/store-information", store_information_routes_1.default);
+app.use("/testimonials", testimonials_routes_1.default);
 async function bootstrap() {
     await (0, mongodb_1.connectToDatabase)();
     app.listen(port, () => {

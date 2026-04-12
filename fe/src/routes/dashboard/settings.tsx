@@ -37,7 +37,7 @@ import {
   fieldInputClassName,
 } from '#/components/ui/helper'
 
-export const Route = createFileRoute('/dashboard/')({
+export const Route = createFileRoute('/dashboard/settings')({
   component: RouteComponent,
   head: () => ({
     meta: [

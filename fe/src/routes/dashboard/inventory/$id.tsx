@@ -149,7 +149,7 @@ function RouteComponent() {
                 },
                 {
                   onSuccess: () => {
-                    void productQuery.refetch()
+                    void navigate({ to: '/dashboard/inventory' })
                   },
                 },
               )

@@ -8,6 +8,8 @@ import Header from '../components/Header'
 
 import Footer from '../components/Footer'
 
+import { Toaster } from 'react-hot-toast'
+
 const Pathname = ({ children }: { children: React.ReactNode }) => {
   const { pathname } = useLocation()
 
@@ -23,6 +25,7 @@ const Pathname = ({ children }: { children: React.ReactNode }) => {
       {!isRoute && <Header />}
       {children}
       {!isRoute && <Footer />}
+      <Toaster position="top-center" />
     </Fragment>
   )
 }

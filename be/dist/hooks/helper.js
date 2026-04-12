@@ -32,9 +32,15 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.slugPattern = void 0;
 exports.getJwtCookieOptions = getJwtCookieOptions;
+exports.getJwtClearCookieOptions = getJwtClearCookieOptions;
+exports.getAuthenticatedUserId = getAuthenticatedUserId;
+exports.issueSessionCookie = issueSessionCookie;
 exports.parseUpdateBlogCategoryBody = parseUpdateBlogCategoryBody;
 exports.parseUpdateBlogBody = parseUpdateBlogBody;
 exports.parseUpdateCategoryBody = parseUpdateCategoryBody;
@@ -46,6 +52,7 @@ exports.parseUpdateProductBody = parseUpdateProductBody;
 exports.uploadImageToImageKit = uploadImageToImageKit;
 exports.uploadManyImagesToImageKit = uploadManyImagesToImageKit;
 const imgkit_1 = __importStar(require("../utils/imgkit"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 //================================= Slug Pattern =================================
 exports.slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const STOCK_STATUS_VALUES = ["in-stock", "low-stock", "out-of-stock"];
@@ -59,6 +66,40 @@ function getJwtCookieOptions() {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         path: "/",
     };
+}
+function getJwtClearCookieOptions() {
+    const o = getJwtCookieOptions();
+    return {
+        httpOnly: o.httpOnly,
+        sameSite: o.sameSite,
+        secure: o.secure,
+        path: o.path,
+    };
+}
+function getAuthenticatedUserId(req) {
+    const token = req.cookies?.session;
+    const secret = process.env.JWT_SECRET;
+    if (!token || !secret)
+        return null;
+    try {
+        const payload = jsonwebtoken_1.default.verify(token, secret);
+        const id = payload.sub != null ? String(payload.sub) : "";
+        return id || null;
+    }
+    catch {
+        return null;
+    }
+}
+function issueSessionCookie(res, publicUser) {
+    const secret = process.env.JWT_SECRET;
+    if (!secret)
+        return;
+    const token = jsonwebtoken_1.default.sign({
+        sub: publicUser._id,
+        email: publicUser.email,
+        name: publicUser.name,
+    }, secret, { expiresIn: "7d" });
+    res.cookie("session", token, getJwtCookieOptions());
 }
 //================================= Parse Update Body =================================//
 function parseUpdateBlogCategoryBody(body) {

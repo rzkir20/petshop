@@ -16,6 +16,10 @@ import categoriesRoutes from "./routes/categories.routes";
 
 import productsRoutes from "./routes/products.routes";
 
+import storeInformationRoutes from "./routes/store-information.routes";
+
+import testimonialsRoutes from "./routes/testimonials.routes";
+
 import { connectToDatabase as connectDb } from "./utils/mongodb";
 
 const app = express();
@@ -43,6 +47,8 @@ app.use("/blog-categories", blogCategoriesRoutes);
 app.use("/blogs", blogRoutes);
 app.use("/categories", categoriesRoutes);
 app.use("/products", productsRoutes);
+app.use("/store-information", storeInformationRoutes);
+app.use("/testimonials", testimonialsRoutes);
 
 async function bootstrap() {
   await connectDb();

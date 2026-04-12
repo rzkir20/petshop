@@ -1,10 +1,5 @@
 import { Inbox } from 'lucide-react'
 
-type EmptyProps = {
-  title?: string
-  description?: string
-}
-
 export function Empaty({
   title = 'Data tidak tersedia',
   description = 'Belum ada data untuk ditampilkan.',

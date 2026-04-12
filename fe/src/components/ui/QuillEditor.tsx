@@ -14,13 +14,6 @@ const modules = {
   ],
 }
 
-type QuillEditorProps = {
-  value: string
-  onChange: (value: string) => void
-  placeholder?: string
-  className?: string
-}
-
 export function QuillEditor({
   value,
   onChange,

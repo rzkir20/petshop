@@ -38,6 +38,8 @@ import {
   settingsCardClassName,
 } from '#/components/ui/helper'
 
+import { Empaty } from '#/components/ui/empaty'
+
 import { cn } from '#/lib/utils'
 
 import {
@@ -253,6 +255,11 @@ function RouteComponent() {
             Coba lagi
           </Button>
         </div>
+      ) : items.length === 0 ? (
+        <Empaty
+          title="Belum ada testimonial"
+          description="Tambahkan testimonial pertama dengan tombol Testimonial baru di atas."
+        />
       ) : (
         <div className="flex flex-col gap-8 xl:flex-row xl:items-start">
           <div className="min-w-0 flex-1 space-y-12">

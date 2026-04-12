@@ -66,6 +66,10 @@ type UpdateProductInput = Partial<CreateProductInput>;
 type ListProductsInput = {
   category?: string;
   q?: string;
+  /** 1-based */
+  page?: number;
+  /** Max items per page (default 10). */
+  limit?: number;
 };
 
 type ProductDocument = InferSchemaType<typeof productSchema> & {

@@ -68,11 +68,13 @@ function DashboardLayout() {
                 ? 'customers'
                 : pathname.startsWith('/dashboard/testimonials')
                   ? 'testimonials'
-                  : pathname.startsWith('/dashboard/support')
-                    ? 'support'
-                    : pathname.startsWith('/dashboard/settings')
-                      ? 'settings'
-                      : 'dashboard'
+                  : pathname.startsWith('/dashboard/template-whatsapp')
+                    ? 'template-whatsapp'
+                    : pathname.startsWith('/dashboard/support')
+                      ? 'support'
+                      : pathname.startsWith('/dashboard/settings')
+                        ? 'settings'
+                        : 'dashboard'
 
   return (
     <div className="min-h-screen bg-[#f3faf5] text-[#173a40]">

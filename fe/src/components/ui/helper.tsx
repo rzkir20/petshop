@@ -1,4 +1,5 @@
 import { cn } from '#/lib/utils.ts'
+
 import { PawPrint } from 'lucide-react'
 
 // ================================ Dashboard Settings Helper Functions ================================ //
@@ -45,4 +46,47 @@ export function DecorativePaws() {
       />
     </>
   )
+}
+
+// ================================ Stock Status Helper Functions ================================ //
+export function statusPillClass(s: StockStatus) {
+  switch (s) {
+    case 'in-stock':
+      return 'bg-emerald-50 text-emerald-600'
+    case 'low-stock':
+      return 'bg-orange-50 text-[#ff6b35]'
+    case 'out-of-stock':
+      return 'bg-red-50 text-red-500'
+    default:
+      return 'bg-gray-100 text-gray-600'
+  }
+}
+
+export function statusLabel(s: StockStatus) {
+  switch (s) {
+    case 'in-stock':
+      return 'In Stock'
+    case 'low-stock':
+      return 'Low Stock'
+    case 'out-of-stock':
+      return 'Out of Stock'
+    default:
+      return ''
+  }
+}
+
+// ================================ Status Blog Helper Functions ================================ //
+export function statusLabelBlog(s: BlogPostStatus): string {
+  return s === 'published' ? 'Published' : 'Draft'
+}
+
+export function publishedAtDisplay(post: BlogPost): string {
+  if (post.status !== 'published') return '—'
+  const d = new Date(post.createdAt)
+  if (Number.isNaN(d.getTime())) return '—'
+  return d.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
 }

@@ -10,11 +10,13 @@ import {
   X,
 } from 'lucide-react'
 
-import { Fragment } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 
 import { Button } from '#/components/ui/button'
 
 import { Empaty } from '#/components/ui/empaty'
+
+import { Pagination } from '#/components/ui/pagination'
 
 import { InventoryTableSkeleton } from '#/hooks/SkelatonUi'
 
@@ -28,6 +30,8 @@ import {
 export const Route = createFileRoute('/dashboard/inventory/')({
   component: InventoryPage,
 })
+
+const PAGE_SIZE = 10
 
 function statusPillClass(s: StockStatus) {
   switch (s) {
@@ -57,11 +61,28 @@ function statusLabel(s: StockStatus) {
 
 function InventoryPage() {
   const navigate = useNavigate()
+  const [page, setPage] = useState(1)
   const filters = useProductsInventoryFiltersState()
-  const { products, loading, error, refresh } = useProductsInventoryState({
-    category: filters.activeCategory,
-    q: filters.searchQuery,
-  })
+  const { products, total: totalItems, loading, error, refresh } =
+    useProductsInventoryState({
+      category: filters.activeCategory,
+      q: filters.searchQuery,
+      page,
+      limit: PAGE_SIZE,
+    })
+
+  const totalPages =
+    totalItems === 0 ? 0 : Math.ceil(totalItems / PAGE_SIZE)
+
+  useEffect(() => {
+    setPage(1)
+  }, [filters.activeCategory, filters.searchQuery])
+
+  useEffect(() => {
+    if (totalPages === 0) return
+    setPage((p) => Math.min(p, totalPages))
+  }, [totalPages])
+
   const ui = useProductsInventoryUiState(products)
   const {
     expandedId,
@@ -382,6 +403,17 @@ function InventoryPage() {
               </table>
             )}
           </div>
+
+          {!loading && products.length > 0 ? (
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              totalItems={totalItems}
+              pageSize={PAGE_SIZE}
+              itemLabel="products"
+            />
+          ) : null}
         </section>
       </div>
 

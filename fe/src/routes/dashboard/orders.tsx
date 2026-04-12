@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
+
 import {
   CheckCircle,
-  ChevronLeft,
-  ChevronRight,
   Clock,
   Download,
   Eye,
@@ -16,13 +15,21 @@ import {
   X,
   XCircle,
 } from 'lucide-react'
+
 import { useMemo, useState } from 'react'
 
-export const Route = createFileRoute('/dashboard/orders/')({
+import { Pagination, usePagination } from '#/components/ui/pagination'
+
+export const Route = createFileRoute('/dashboard/orders')({
   component: OrdersPage,
 })
 
-type OrderStatus = 'completed' | 'processing' | 'pending' | 'shipped' | 'cancelled'
+type OrderStatus =
+  | 'completed'
+  | 'processing'
+  | 'pending'
+  | 'shipped'
+  | 'cancelled'
 
 type PaymentState = 'paid' | 'pending' | 'refunded'
 
@@ -98,7 +105,11 @@ const ordersData: OrderRow[] = [
   },
 ]
 
-const tabs: { id: string; label: string; match: OrderStatus | 'all' | 'delivered' }[] = [
+const tabs: {
+  id: string
+  label: string
+  match: OrderStatus | 'all' | 'delivered'
+}[] = [
   { id: 'all', label: 'All Orders', match: 'all' },
   { id: 'pending', label: 'Pending', match: 'pending' },
   { id: 'processing', label: 'Processing', match: 'processing' },
@@ -166,6 +177,8 @@ function PaymentCell({ payment }: { payment: PaymentState }) {
   )
 }
 
+const PAGE_SIZE = 10
+
 function OrdersPage() {
   const [activeTab, setActiveTab] = useState('all')
   const [selected, setSelected] = useState<Set<string>>(new Set())
@@ -179,10 +192,18 @@ function OrdersPage() {
     return ordersData.filter((o) => o.status === tab.match)
   }, [activeTab])
 
-  const visibleIds = filteredOrders.map((o) => o.id)
+  const {
+    page,
+    setPage,
+    totalPages,
+    totalItems,
+    pageSlice: paginatedOrders,
+  } = usePagination(filteredOrders, PAGE_SIZE, activeTab)
+
+  const pageIds = paginatedOrders.map((o) => o.id)
   const selectedCount = selected.size
   const allVisibleSelected =
-    visibleIds.length > 0 && visibleIds.every((id) => selected.has(id))
+    pageIds.length > 0 && pageIds.every((id) => selected.has(id))
 
   function toggleRow(id: string) {
     setSelected((prev) => {
@@ -197,9 +218,9 @@ function OrdersPage() {
     setSelected((prev) => {
       const next = new Set(prev)
       if (allVisibleSelected) {
-        visibleIds.forEach((id) => next.delete(id))
+        pageIds.forEach((id) => next.delete(id))
       } else {
-        visibleIds.forEach((id) => next.add(id))
+        pageIds.forEach((id) => next.add(id))
       }
       return next
     })
@@ -289,23 +310,30 @@ function OrdersPage() {
                 <th className="py-5 pr-4 pl-8">
                   <input
                     type="checkbox"
-                    checked={allVisibleSelected && visibleIds.length > 0}
+                    checked={allVisibleSelected && pageIds.length > 0}
                     onChange={toggleSelectAll}
                     className="h-4 w-4 rounded border-gray-300 text-emerald-500 focus:ring-emerald-500"
                   />
                 </th>
-                {['Order ID', 'Customer', 'Items', 'Date', 'Amount', 'Payment', 'Status', 'Actions'].map(
-                  (heading) => (
-                    <th
-                      key={heading}
-                      className={`px-4 py-5 text-[10px] font-bold tracking-widest text-gray-400 uppercase ${
-                        heading === 'Status' ? 'text-center' : ''
-                      } ${heading === 'Actions' ? 'pr-8 text-right' : ''}`}
-                    >
-                      {heading}
-                    </th>
-                  ),
-                )}
+                {[
+                  'Order ID',
+                  'Customer',
+                  'Items',
+                  'Date',
+                  'Amount',
+                  'Payment',
+                  'Status',
+                  'Actions',
+                ].map((heading) => (
+                  <th
+                    key={heading}
+                    className={`px-4 py-5 text-[10px] font-bold tracking-widest text-gray-400 uppercase ${
+                      heading === 'Status' ? 'text-center' : ''
+                    } ${heading === 'Actions' ? 'pr-8 text-right' : ''}`}
+                  >
+                    {heading}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -322,7 +350,9 @@ function OrdersPage() {
                       className="h-4 w-4 rounded border-gray-300 text-emerald-500 focus:ring-emerald-500"
                     />
                   </td>
-                  <td className="px-4 py-5 text-sm font-bold text-[#173a40]">{row.id}</td>
+                  <td className="px-4 py-5 text-sm font-bold text-[#173a40]">
+                    {row.id}
+                  </td>
                   <td className="px-4 py-5 text-sm font-medium">
                     <div className="flex items-center gap-3">
                       <img
@@ -343,7 +373,9 @@ function OrdersPage() {
                       <span className="font-medium">{row.primaryItem}</span>
                     )}
                   </td>
-                  <td className="px-4 py-5 text-sm text-gray-500">{row.date}</td>
+                  <td className="px-4 py-5 text-sm text-gray-500">
+                    {row.date}
+                  </td>
                   <td className="px-4 py-5 text-sm font-bold">{row.amount}</td>
                   <td className="px-4 py-5">
                     <PaymentCell payment={row.payment} />
@@ -377,49 +409,21 @@ function OrdersPage() {
           </table>
         </div>
 
-        <div className="flex items-center justify-between border-t border-gray-50 bg-gray-50/20 p-8">
-          <div className="text-sm font-medium text-gray-500">
-            Showing <span className="font-bold text-[#173a40]">1-10</span> of{' '}
-            <span className="font-bold text-[#173a40]">152</span> orders
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-emerald-100 text-gray-400 transition-all hover:bg-emerald-50"
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <button
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-white shadow-sm"
-            >
-              1
-            </button>
-            <button
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-emerald-100 text-sm font-bold text-gray-600 transition-all hover:bg-emerald-50"
-            >
-              2
-            </button>
-            <button
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-emerald-100 text-sm font-bold text-gray-600 transition-all hover:bg-emerald-50"
-            >
-              3
-            </button>
-            <button
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-emerald-100 text-gray-400 transition-all hover:bg-emerald-50"
-            >
-              <ChevronRight size={18} />
-            </button>
-          </div>
-        </div>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          totalItems={totalItems}
+          pageSize={PAGE_SIZE}
+          itemLabel="orders"
+        />
       </section>
 
       <div
         className={`fixed bottom-8 left-1/2 z-40 flex -translate-x-1/2 items-center gap-8 rounded-full bg-[#173a40] px-8 py-4 text-white shadow-2xl transition-all duration-500 ${
-          selectedCount > 0 ? 'translate-y-0 opacity-100' : 'translate-y-24 opacity-0 pointer-events-none'
+          selectedCount > 0
+            ? 'translate-y-0 opacity-100'
+            : 'translate-y-24 opacity-0 pointer-events-none'
         }`}
       >
         <div className="flex items-center gap-2">

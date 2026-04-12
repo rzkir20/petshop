@@ -1,32 +1,36 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { ChevronRight, Edit2, FileText, Plus, RefreshCw, Search, Trash2 } from 'lucide-react'
+
+import {
+  ChevronRight,
+  Edit2,
+  FileText,
+  Plus,
+  RefreshCw,
+  Search,
+  Trash2,
+} from 'lucide-react'
 
 import { formatUpdatedAt } from '#/hooks/format-date'
+
+import { statusLabelBlog, publishedAtDisplay } from '#/components/ui/helper'
+
 import { useBlogDashboardListState } from '#/services/blog.service'
 
 export const Route = createFileRoute('/dashboard/blog/')({
   component: RouteComponent,
 })
 
-function statusLabel(s: BlogPostStatus): string {
-  return s === 'published' ? 'Published' : 'Draft'
-}
-
-function publishedAtDisplay(post: BlogPost): string {
-  if (post.status !== 'published') return '—'
-  const d = new Date(post.createdAt)
-  if (Number.isNaN(d.getTime())) return '—'
-  return d.toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
-}
-
 function RouteComponent() {
   const navigate = useNavigate()
-  const { search, setSearch, postsQuery, blogPosts, filteredPosts, deleteRow, remove } =
-    useBlogDashboardListState()
+  const {
+    search,
+    setSearch,
+    postsQuery,
+    blogPosts,
+    filteredPosts,
+    deleteRow,
+    remove,
+  } = useBlogDashboardListState()
 
   return (
     <div className="space-y-6 p-8">
@@ -38,8 +42,12 @@ function RouteComponent() {
             <ChevronRight size={12} />
             Posts
           </p>
-          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight">Blog Posts</h1>
-          <p className="mt-1 text-gray-500">Kelola konten artikel blog untuk storefront.</p>
+          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight">
+            Blog Posts
+          </h1>
+          <p className="mt-1 text-gray-500">
+            Kelola konten artikel blog untuk storefront.
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
@@ -49,7 +57,10 @@ function RouteComponent() {
             className="inline-flex items-center gap-2 rounded-full border border-emerald-100 px-4 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-emerald-50 disabled:opacity-50"
             aria-label="Refresh"
           >
-            <RefreshCw size={16} className={postsQuery.isFetching ? 'animate-spin' : ''} />
+            <RefreshCw
+              size={16}
+              className={postsQuery.isFetching ? 'animate-spin' : ''}
+            />
             Refresh
           </button>
           <button
@@ -81,7 +92,9 @@ function RouteComponent() {
         </div>
 
         {postsQuery.isPending ? (
-          <p className="py-12 text-center text-sm text-gray-500">Memuat post…</p>
+          <p className="py-12 text-center text-sm text-gray-500">
+            Memuat post…
+          </p>
         ) : postsQuery.isError ? (
           <div className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
             {postsQuery.error instanceof Error
@@ -105,7 +118,10 @@ function RouteComponent() {
               <tbody>
                 {filteredPosts.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-12 text-center text-sm text-gray-500">
+                    <td
+                      colSpan={7}
+                      className="px-4 py-12 text-center text-sm text-gray-500"
+                    >
                       {blogPosts.length === 0
                         ? 'Belum ada post. Buat post baru dari tombol Add Post.'
                         : 'Tidak ada post yang cocok dengan pencarian.'}
@@ -114,11 +130,15 @@ function RouteComponent() {
                 ) : (
                   filteredPosts.map((post) => (
                     <tr key={post._id} className="border-t border-emerald-50">
-                      <td className="px-4 py-3 font-medium text-[#173a40]">{post.title}</td>
+                      <td className="px-4 py-3 font-medium text-[#173a40]">
+                        {post.title}
+                      </td>
                       <td className="px-4 py-3 text-gray-600">
                         {post.categoryName ?? post.category}
                       </td>
-                      <td className="px-4 py-3 text-gray-600">{post.author.name}</td>
+                      <td className="px-4 py-3 text-gray-600">
+                        {post.author.name}
+                      </td>
                       <td className="px-4 py-3">
                         <span
                           className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
@@ -127,10 +147,12 @@ function RouteComponent() {
                               : 'bg-amber-100 text-amber-700'
                           }`}
                         >
-                          {statusLabel(post.status)}
+                          {statusLabelBlog(post.status)}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-gray-600">{publishedAtDisplay(post)}</td>
+                      <td className="px-4 py-3 text-gray-600">
+                        {publishedAtDisplay(post)}
+                      </td>
                       <td className="px-4 py-3 text-xs text-gray-500">
                         {formatUpdatedAt(post.updatedAt)}
                       </td>

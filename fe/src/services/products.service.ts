@@ -12,8 +12,20 @@ import { createRestCrudResource, requestJson } from '#/services/crud.service'
 
 export const productsQueryKeys = {
     all: ['products'] as const,
-    list: (filters?: { category?: string; q?: string }) =>
-        [...productsQueryKeys.all, 'list', filters?.category ?? '', filters?.q ?? ''] as const,
+    list: (filters?: {
+        category?: string
+        q?: string
+        page?: number
+        limit?: number
+    }) =>
+        [
+            ...productsQueryKeys.all,
+            'list',
+            filters?.category ?? '',
+            filters?.q ?? '',
+            filters?.page ?? 1,
+            filters?.limit ?? 10,
+        ] as const,
 }
 
 const api = createRestCrudResource<Product, CreateProductInput, UpdateProductInput>({
@@ -22,7 +34,19 @@ const api = createRestCrudResource<Product, CreateProductInput, UpdateProductInp
     itemKey: 'product',
 })
 
-export async function listProducts(filters?: { category?: string; q?: string }): Promise<Product[]> {
+export type ListProductsResult = {
+    products: Product[]
+    total: number
+    page: number
+    limit: number
+}
+
+export async function listProducts(filters?: {
+    category?: string
+    q?: string
+    page?: number
+    limit?: number
+}): Promise<ListProductsResult> {
     const params = new URLSearchParams()
     if (filters?.category && filters.category !== 'all') {
         params.set('category', filters.category)
@@ -30,10 +54,21 @@ export async function listProducts(filters?: { category?: string; q?: string }):
     if (filters?.q && filters.q.trim()) {
         params.set('q', filters.q.trim())
     }
-    const suffix = params.toString()
-    const path = suffix ? `/products?${suffix}` : '/products'
-    const res = await requestJson<Record<string, unknown>>(path)
-    return res.products as Product[]
+    const page = Math.max(1, filters?.page ?? 1)
+    const limit = Math.min(100, Math.max(1, filters?.limit ?? 10))
+    params.set('page', String(page))
+    params.set('limit', String(limit))
+    const res = await requestJson<Record<string, unknown>>(
+        `/products?${params.toString()}`,
+    )
+    return {
+        products: Array.isArray(res.products)
+            ? (res.products as Product[])
+            : [],
+        total: Number(res.total) || 0,
+        page: Number(res.page) || page,
+        limit: Number(res.limit) || limit,
+    }
 }
 
 export async function getProduct(id: string): Promise<Product> {
@@ -131,7 +166,12 @@ function toRow(p: Product): ProductRow {
     }
 }
 
-export function useProductsInventoryState(filters?: { category?: string; q?: string }) {
+export function useProductsInventoryState(filters?: {
+    category?: string
+    q?: string
+    page?: number
+    limit?: number
+}) {
     const queryClient = useQueryClient()
 
     const listQuery = useQuery({
@@ -142,10 +182,12 @@ export function useProductsInventoryState(filters?: { category?: string; q?: str
         refetchOnWindowFocus: false,
     })
 
-    const products = (listQuery.data ?? []).map(toRow)
+    const products = (listQuery.data?.products ?? []).map(toRow)
+    const total = listQuery.data?.total ?? 0
 
     return {
         products,
+        total,
         loading: listQuery.isPending,
         error: listQuery.isError
             ? listQuery.error instanceof Error
@@ -154,7 +196,7 @@ export function useProductsInventoryState(filters?: { category?: string; q?: str
             : null,
         refresh: () => listQuery.refetch(),
         invalidate: () =>
-            queryClient.invalidateQueries({ queryKey: productsQueryKeys.list() }),
+            queryClient.invalidateQueries({ queryKey: productsQueryKeys.all }),
     }
 }
 

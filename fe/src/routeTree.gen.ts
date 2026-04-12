@@ -28,13 +28,14 @@ import { Route as RulesTermsRouteImport } from './routes/rules/terms'
 import { Route as RulesPrivacyPolicyRouteImport } from './routes/rules/privacy-policy'
 import { Route as RulesCookiesRouteImport } from './routes/rules/cookies'
 import { Route as DashboardTestimonialsRouteImport } from './routes/dashboard/testimonials'
+import { Route as DashboardTemplateWhatsappRouteImport } from './routes/dashboard/template-whatsapp'
 import { Route as DashboardSupportRouteImport } from './routes/dashboard/support'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
+import { Route as DashboardOrdersRouteImport } from './routes/dashboard/orders'
 import { Route as CategoriesSlugRouteImport } from './routes/categories/$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as authSignupRouteImport } from './routes/(auth)/signup'
 import { Route as authSigninRouteImport } from './routes/(auth)/signin'
-import { Route as DashboardOrdersIndexRouteImport } from './routes/dashboard/orders/index'
 import { Route as DashboardInventoryIndexRouteImport } from './routes/dashboard/inventory/index'
 import { Route as DashboardCostumersIndexRouteImport } from './routes/dashboard/costumers/index'
 import { Route as DashboardBlogIndexRouteImport } from './routes/dashboard/blog/index'
@@ -142,6 +143,12 @@ const DashboardTestimonialsRoute = DashboardTestimonialsRouteImport.update({
   path: '/testimonials',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardTemplateWhatsappRoute =
+  DashboardTemplateWhatsappRouteImport.update({
+    id: '/template-whatsapp',
+    path: '/template-whatsapp',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
 const DashboardSupportRoute = DashboardSupportRouteImport.update({
   id: '/support',
   path: '/support',
@@ -150,6 +157,11 @@ const DashboardSupportRoute = DashboardSupportRouteImport.update({
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardOrdersRoute = DashboardOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
@@ -171,11 +183,6 @@ const authSigninRoute = authSigninRouteImport.update({
   id: '/(auth)/signin',
   path: '/signin',
   getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardOrdersIndexRoute = DashboardOrdersIndexRouteImport.update({
-  id: '/orders/',
-  path: '/orders/',
-  getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardInventoryIndexRoute = DashboardInventoryIndexRouteImport.update({
   id: '/inventory/',
@@ -251,8 +258,10 @@ export interface FileRoutesByFullPath {
   '/signup': typeof authSignupRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/dashboard/orders': typeof DashboardOrdersRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/support': typeof DashboardSupportRoute
+  '/dashboard/template-whatsapp': typeof DashboardTemplateWhatsappRoute
   '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/rules/cookies': typeof RulesCookiesRoute
   '/rules/privacy-policy': typeof RulesPrivacyPolicyRoute
@@ -273,7 +282,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/blog/': typeof DashboardBlogIndexRoute
   '/dashboard/costumers/': typeof DashboardCostumersIndexRoute
   '/dashboard/inventory/': typeof DashboardInventoryIndexRoute
-  '/dashboard/orders/': typeof DashboardOrdersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -289,8 +297,10 @@ export interface FileRoutesByTo {
   '/signup': typeof authSignupRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/dashboard/orders': typeof DashboardOrdersRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/support': typeof DashboardSupportRoute
+  '/dashboard/template-whatsapp': typeof DashboardTemplateWhatsappRoute
   '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/rules/cookies': typeof RulesCookiesRoute
   '/rules/privacy-policy': typeof RulesPrivacyPolicyRoute
@@ -311,7 +321,6 @@ export interface FileRoutesByTo {
   '/dashboard/blog': typeof DashboardBlogIndexRoute
   '/dashboard/costumers': typeof DashboardCostumersIndexRoute
   '/dashboard/inventory': typeof DashboardInventoryIndexRoute
-  '/dashboard/orders': typeof DashboardOrdersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -329,8 +338,10 @@ export interface FileRoutesById {
   '/(auth)/signup': typeof authSignupRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/dashboard/orders': typeof DashboardOrdersRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/support': typeof DashboardSupportRoute
+  '/dashboard/template-whatsapp': typeof DashboardTemplateWhatsappRoute
   '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/rules/cookies': typeof RulesCookiesRoute
   '/rules/privacy-policy': typeof RulesPrivacyPolicyRoute
@@ -351,7 +362,6 @@ export interface FileRoutesById {
   '/dashboard/blog/': typeof DashboardBlogIndexRoute
   '/dashboard/costumers/': typeof DashboardCostumersIndexRoute
   '/dashboard/inventory/': typeof DashboardInventoryIndexRoute
-  '/dashboard/orders/': typeof DashboardOrdersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -370,8 +380,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/blog/$slug'
     | '/categories/$slug'
+    | '/dashboard/orders'
     | '/dashboard/settings'
     | '/dashboard/support'
+    | '/dashboard/template-whatsapp'
     | '/dashboard/testimonials'
     | '/rules/cookies'
     | '/rules/privacy-policy'
@@ -392,7 +404,6 @@ export interface FileRouteTypes {
     | '/dashboard/blog/'
     | '/dashboard/costumers/'
     | '/dashboard/inventory/'
-    | '/dashboard/orders/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -408,8 +419,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/blog/$slug'
     | '/categories/$slug'
+    | '/dashboard/orders'
     | '/dashboard/settings'
     | '/dashboard/support'
+    | '/dashboard/template-whatsapp'
     | '/dashboard/testimonials'
     | '/rules/cookies'
     | '/rules/privacy-policy'
@@ -430,7 +443,6 @@ export interface FileRouteTypes {
     | '/dashboard/blog'
     | '/dashboard/costumers'
     | '/dashboard/inventory'
-    | '/dashboard/orders'
   id:
     | '__root__'
     | '/'
@@ -447,8 +459,10 @@ export interface FileRouteTypes {
     | '/(auth)/signup'
     | '/blog/$slug'
     | '/categories/$slug'
+    | '/dashboard/orders'
     | '/dashboard/settings'
     | '/dashboard/support'
+    | '/dashboard/template-whatsapp'
     | '/dashboard/testimonials'
     | '/rules/cookies'
     | '/rules/privacy-policy'
@@ -469,7 +483,6 @@ export interface FileRouteTypes {
     | '/dashboard/blog/'
     | '/dashboard/costumers/'
     | '/dashboard/inventory/'
-    | '/dashboard/orders/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -631,6 +644,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTestimonialsRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/template-whatsapp': {
+      id: '/dashboard/template-whatsapp'
+      path: '/template-whatsapp'
+      fullPath: '/dashboard/template-whatsapp'
+      preLoaderRoute: typeof DashboardTemplateWhatsappRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/support': {
       id: '/dashboard/support'
       path: '/support'
@@ -643,6 +663,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/dashboard/settings'
       preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/orders': {
+      id: '/dashboard/orders'
+      path: '/orders'
+      fullPath: '/dashboard/orders'
+      preLoaderRoute: typeof DashboardOrdersRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/categories/$slug': {
@@ -672,13 +699,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/signin'
       preLoaderRoute: typeof authSigninRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/orders/': {
-      id: '/dashboard/orders/'
-      path: '/orders'
-      fullPath: '/dashboard/orders/'
-      preLoaderRoute: typeof DashboardOrdersIndexRouteImport
-      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/inventory/': {
       id: '/dashboard/inventory/'
@@ -761,8 +781,10 @@ declare module '@tanstack/react-router' {
 }
 
 interface DashboardRouteRouteChildren {
+  DashboardOrdersRoute: typeof DashboardOrdersRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardSupportRoute: typeof DashboardSupportRoute
+  DashboardTemplateWhatsappRoute: typeof DashboardTemplateWhatsappRoute
   DashboardTestimonialsRoute: typeof DashboardTestimonialsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardBlogIdRoute: typeof DashboardBlogIdRoute
@@ -776,12 +798,13 @@ interface DashboardRouteRouteChildren {
   DashboardBlogIndexRoute: typeof DashboardBlogIndexRoute
   DashboardCostumersIndexRoute: typeof DashboardCostumersIndexRoute
   DashboardInventoryIndexRoute: typeof DashboardInventoryIndexRoute
-  DashboardOrdersIndexRoute: typeof DashboardOrdersIndexRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardOrdersRoute: DashboardOrdersRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardSupportRoute: DashboardSupportRoute,
+  DashboardTemplateWhatsappRoute: DashboardTemplateWhatsappRoute,
   DashboardTestimonialsRoute: DashboardTestimonialsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardBlogIdRoute: DashboardBlogIdRoute,
@@ -795,7 +818,6 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardBlogIndexRoute: DashboardBlogIndexRoute,
   DashboardCostumersIndexRoute: DashboardCostumersIndexRoute,
   DashboardInventoryIndexRoute: DashboardInventoryIndexRoute,
-  DashboardOrdersIndexRoute: DashboardOrdersIndexRoute,
 }
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(

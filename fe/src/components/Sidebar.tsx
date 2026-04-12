@@ -1,100 +1,10 @@
-import {
-  BarChart3,
-  BookText,
-  ChevronDown,
-  Crown,
-  HelpCircle,
-  LayoutDashboard,
-  Package,
-  PawPrint,
-  Settings,
-  ShoppingBag,
-  Star,
-  Users2,
-} from 'lucide-react'
+import { ChevronDown, Crown, PawPrint } from 'lucide-react'
+
 import { Link } from '@tanstack/react-router'
 
-type SidebarItem = {
-  id: string
-  label: string
-  icon: React.ComponentType<{ size?: number; className?: string }>
-  href?: string
-  to?: string
-  subItems?: Array<{
-    id: string
-    label: string
-    to: string
-  }>
-}
+import { cn } from '#/lib/utils'
 
-const mainMenuItems: SidebarItem[] = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    icon: LayoutDashboard,
-    to: '/dashboard',
-  },
-  {
-    id: 'analytics',
-    label: 'Analytics',
-    icon: BarChart3,
-    to: '/dashboard/analytics',
-  },
-  { id: 'orders', label: 'Orders', icon: ShoppingBag, to: '/dashboard/orders' },
-  {
-    id: 'inventory',
-    label: 'Inventory',
-    icon: Package,
-    subItems: [
-      { id: 'inventory-post', label: 'Post', to: '/dashboard/inventory' },
-      {
-        id: 'inventory-category',
-        label: 'Category',
-        to: '/dashboard/inventory/categories',
-      },
-    ],
-  },
-  {
-    id: 'blog',
-    label: 'Blog',
-    icon: BookText,
-    subItems: [
-      { id: 'blog-post', label: 'Post', to: '/dashboard/blog' },
-      {
-        id: 'blog-category',
-        label: 'Category',
-        to: '/dashboard/blog/categories',
-      },
-    ],
-  },
-  {
-    id: 'testimonials',
-    label: 'Testimonials',
-    icon: Star,
-    to: '/dashboard/testimonials',
-  },
-  {
-    id: 'customers',
-    label: 'Customers',
-    icon: Users2,
-    to: '/dashboard/costumers',
-  },
-]
-
-const accountItems: SidebarItem[] = [
-  {
-    id: 'settings',
-    label: 'Settings',
-    icon: Settings,
-    href: '/dashboard/settings',
-  },
-  {
-    id: 'support',
-    label: 'Support',
-    icon: HelpCircle,
-    href: '/dashboard/support',
-  },
-]
+import { mainMenuItems, accountItems } from '#/data/data'
 
 export default function Sidebar({
   activeItem = 'dashboard',
@@ -111,9 +21,9 @@ export default function Sidebar({
 }) {
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-40 flex h-full w-72 flex-col border-r border-emerald-100 bg-white transition-transform duration-300 xl:translate-x-0 ${className}`}
+      className={`fixed inset-y-0 left-0 z-40 flex h-full min-h-0 w-72 flex-col overflow-hidden border-r border-emerald-100 bg-white transition-transform duration-300 xl:translate-x-0 ${className}`}
     >
-      <div className="flex items-center gap-3 p-8">
+      <div className="shrink-0 flex items-center gap-3 p-8">
         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-[0_4px_14px_0_rgba(16,185,129,0.15)]">
           <PawPrint size={20} />
         </div>
@@ -122,7 +32,15 @@ export default function Sidebar({
         </span>
       </div>
 
-      <nav className="mt-4 flex-1 space-y-2 px-4">
+      <nav
+        className={cn(
+          'mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto overflow-x-hidden px-4',
+          '[scrollbar-width:thin] [scrollbar-color:rgb(167_243_208)_transparent]',
+          '[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent',
+          '[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-emerald-200/90',
+          '[&::-webkit-scrollbar-thumb:hover]:bg-emerald-300',
+        )}
+      >
         <p className="mb-4 px-4 text-[10px] font-bold tracking-widest text-emerald-600/50 uppercase">
           Main Menu
         </p>
@@ -155,24 +73,26 @@ export default function Sidebar({
                     className="ml-auto transition-transform duration-300 group-open:rotate-180"
                   />
                 </summary>
-                <div className="mt-1 space-y-1 pl-10">
-                  {item.subItems.map((subItem) => {
-                    const isSubActive = activeItem === subItem.id
-                    return (
-                      <Link
-                        key={subItem.id}
-                        to={subItem.to}
-                        onClick={onNavigate}
-                        className={`flex items-center rounded-xl px-3 py-2 text-sm font-medium transition-all duration-300 ${
-                          isSubActive
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : 'text-gray-500 hover:bg-emerald-50 hover:text-emerald-500'
-                        }`}
-                      >
-                        {subItem.label}
-                      </Link>
-                    )
-                  })}
+                <div className="mt-2 border-t border-emerald-100 pt-2">
+                  <div className="ml-3 space-y-1 border-l-2 border-emerald-100 pl-4">
+                    {item.subItems.map((subItem) => {
+                      const isSubActive = activeItem === subItem.id
+                      return (
+                        <Link
+                          key={subItem.id}
+                          to={subItem.to}
+                          onClick={onNavigate}
+                          className={`flex items-center rounded-xl px-3 py-2 text-sm font-medium transition-all duration-300 ${
+                            isSubActive
+                              ? 'bg-emerald-100 text-emerald-700'
+                              : 'text-gray-500 hover:bg-emerald-50 hover:text-emerald-500'
+                          }`}
+                        >
+                          {subItem.label}
+                        </Link>
+                      )
+                    })}
+                  </div>
                 </div>
               </details>
             )
@@ -241,7 +161,7 @@ export default function Sidebar({
       </nav>
 
       {showUpgradeCard ? (
-        <div className="p-6">
+        <div className="shrink-0 p-6">
           <div className="rounded-[24px] bg-emerald-50 p-5 text-center">
             <div className="mx-auto -mt-10 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0_4px_14px_0_rgba(16,185,129,0.15)]">
               <Crown size={18} className="text-[#ff6b35]" />

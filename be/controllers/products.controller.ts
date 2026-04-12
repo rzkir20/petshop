@@ -15,12 +15,26 @@ export async function list(req: Request, res: Response) {
     await Products.ensureIndexes();
     const rawCategory = asString(req.query.category);
     const rawQ = asString(req.query.q);
-    const rows = await Products.listProducts({
+    const rawPage = asNumber(req.query.page);
+    const rawLimit = asNumber(req.query.limit);
+    const page =
+      Number.isFinite(rawPage) && rawPage >= 1 ? Math.floor(rawPage) : 1;
+    const limit =
+      Number.isFinite(rawLimit) && rawLimit >= 1
+        ? Math.min(100, Math.floor(rawLimit))
+        : 10;
+
+    const { rows, total } = await Products.listProducts({
       category: rawCategory && rawCategory !== "all" ? rawCategory : undefined,
       q: rawQ || undefined,
+      page,
+      limit,
     });
     return res.status(200).json({
       products: rows.map((row) => Products.toPublic(row)),
+      total,
+      page,
+      limit,
     });
   } catch (err) {
     console.error(err);

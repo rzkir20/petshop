@@ -6,11 +6,6 @@ import { X } from 'lucide-react'
 
 import { cn } from '#/lib/utils'
 
-type DialogContextValue = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}
-
 const DialogContext = React.createContext<DialogContextValue | null>(null)
 
 function useDialogContext() {
@@ -111,9 +106,7 @@ export function DialogHeader({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div className={cn('mb-4 pr-8', className)} {...props} />
-  )
+  return <div className={cn('mb-4 pr-8', className)} {...props} />
 }
 
 export function DialogTitle({
@@ -148,7 +141,10 @@ export function DialogFooter({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('mt-6 flex flex-wrap items-center justify-end gap-2', className)}
+      className={cn(
+        'mt-6 flex flex-wrap items-center justify-end gap-2',
+        className,
+      )}
       {...props}
     />
   )

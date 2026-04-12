@@ -67,8 +67,16 @@ async function listProducts(input) {
             { category: { $regex: safe, $options: "i" } },
         ];
     }
-    const docs = await ProductModel.find(filter).sort({ updatedAt: -1 }).lean();
-    return docs;
+    const page = Math.max(1, Math.floor(Number(input?.page) || 1));
+    const limit = Math.min(100, Math.max(1, Math.floor(Number(input?.limit) || 10)));
+    const skip = (page - 1) * limit;
+    const total = await ProductModel.countDocuments(filter);
+    const docs = await ProductModel.find(filter)
+        .sort({ updatedAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean();
+    return { rows: docs, total };
 }
 async function findById(id) {
     if (!mongoose_1.Types.ObjectId.isValid(id))

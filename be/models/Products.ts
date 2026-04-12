@@ -61,7 +61,7 @@ export async function ensureIndexes(): Promise<void> {
 
 export async function listProducts(
   input?: ListProductsInput,
-): Promise<ProductDocument[]> {
+): Promise<{ rows: ProductDocument[]; total: number }> {
   const filter: Record<string, unknown> = {};
   const category = String(input?.category || "").trim().toLowerCase();
   const q = String(input?.q || "").trim();
@@ -79,8 +79,18 @@ export async function listProducts(
     ];
   }
 
-  const docs = await ProductModel.find(filter).sort({ updatedAt: -1 }).lean();
-  return docs as ProductDocument[];
+  const page = Math.max(1, Math.floor(Number(input?.page) || 1));
+  const limit = Math.min(100, Math.max(1, Math.floor(Number(input?.limit) || 10)));
+  const skip = (page - 1) * limit;
+
+  const total = await ProductModel.countDocuments(filter);
+  const docs = await ProductModel.find(filter)
+    .sort({ updatedAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .lean();
+
+  return { rows: docs as ProductDocument[], total };
 }
 
 export async function findById(id: string): Promise<ProductDocument | null> {

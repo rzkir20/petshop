@@ -11,6 +11,7 @@ const categorySchema = new Schema(
   {
     name: { type: String, required: true, trim: true },
     description: { type: String, trim: true, default: "" },
+    image: { type: String, trim: true, default: "" },
     count: { type: Number, min: 0, default: 0 },
     slug: {
       type: String,
@@ -40,6 +41,7 @@ export type CreateCategoryInput = {
   name: string;
   description?: string;
   slug: string;
+  image?: string;
   status?: CategoryStatus;
 };
 
@@ -47,6 +49,7 @@ export type UpdateCategoryInput = {
   name?: string;
   description?: string;
   slug?: string;
+  image?: string;
   status?: CategoryStatus;
 };
 
@@ -89,6 +92,7 @@ export async function createCategory(
     name: String(input.name || "").trim(),
     description: String(input.description || "").trim(),
     slug: normalizeSlug(input.slug),
+    image: String(input.image || "").trim(),
     status: input.status === "inactive" ? "inactive" : "active",
   });
   return created.toObject() as CategoryDocument;
@@ -109,6 +113,9 @@ export async function updateCategory(
   }
   if (input.slug !== undefined) {
     $set.slug = normalizeSlug(input.slug);
+  }
+  if (input.image !== undefined) {
+    $set.image = String(input.image || "").trim();
   }
   if (input.status !== undefined) {
     $set.status = input.status === "inactive" ? "inactive" : "active";
@@ -149,6 +156,7 @@ export function toPublic(category: CategoryDocument | null) {
     _id: String(category._id || ""),
     name: category.name,
     description: category.description,
+    image: category.image,
     count: Number(category.count || 0),
     slug: category.slug,
     status: category.status as CategoryStatus,

@@ -50,10 +50,6 @@ export type RestCrudResourceOptions = {
   itemKey: string
 }
 
-/**
- * Standard REST CRUD: GET collection, GET/PATCH/DELETE by id, POST create.
- * Adjust listKey/itemKey to match your backend envelope.
- */
 export function createRestCrudResource<
   TItem,
   TCreate extends object = object,

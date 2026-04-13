@@ -223,6 +223,12 @@ export function parseUpdateCategoryBody(body: unknown): UpdateCategoryInput | nu
         }
         out.slug = b.slug;
     }
+    if ("image" in b) {
+        if (typeof b.image !== "string") {
+            return null;
+        }
+        out.image = b.image;
+    }
     if ("status" in b) {
         if (b.status !== "active" && b.status !== "inactive") {
             return null;
@@ -234,6 +240,7 @@ export function parseUpdateCategoryBody(body: unknown): UpdateCategoryInput | nu
         out.name === undefined &&
         out.description === undefined &&
         out.slug === undefined &&
+        out.image === undefined &&
         out.status === undefined
     ) {
         return null;
@@ -322,6 +329,21 @@ export function parseUpdateProductBody(body: unknown): UpdateProductInput | null
                 const parsed = JSON.parse(b.images) as unknown;
                 if (!Array.isArray(parsed)) return null;
                 out.images = parsed.map((v) => asString(v)).filter(Boolean);
+            } catch {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+    if ("highlights" in b) {
+        if (Array.isArray(b.highlights)) {
+            out.highlights = b.highlights.map((v) => asString(v)).filter(Boolean);
+        } else if (typeof b.highlights === "string") {
+            try {
+                const parsed = JSON.parse(b.highlights) as unknown;
+                if (!Array.isArray(parsed)) return null;
+                out.highlights = parsed.map((v) => asString(v)).filter(Boolean);
             } catch {
                 return null;
             }

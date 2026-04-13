@@ -284,6 +284,17 @@ function RouteComponent() {
               />
             </div>
 
+            <div className="md:col-span-2">
+              <Label htmlFor="edit-product-highlights">Highlights</Label>
+              <textarea
+                id="edit-product-highlights"
+                value={form.highlightsText}
+                onChange={(e) => form.setHighlightsText(e.target.value)}
+                placeholder={'Satu highlight per baris\nContoh: High protein formula'}
+                className="mt-2 min-h-28 w-full rounded-xl border border-emerald-100 px-3 py-2 text-sm outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
+              />
+            </div>
+
             <div>
               <Label htmlFor="edit-product-stock-current">Stock current</Label>
               <Input

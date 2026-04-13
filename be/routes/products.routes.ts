@@ -1,27 +1,33 @@
-import express from "express";
+import express from "express"
 
-import multer from "multer";
+import multer from "multer"
 
 import {
     create,
+    getByCategory,
     getById,
+    getBySlug,
     list,
     remove,
     update,
-} from "../controllers/products.controller";
+} from "../controllers/products.controller"
 
-const router = express.Router();
+const router = express.Router()
 
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ storage: multer.memoryStorage() })
 
-router.get("/", list);
+router.get("/", list)
 
-router.get("/:id", getById);
+router.get("/category/:category", getByCategory)
 
-router.post("/", upload.array("images", 10), create);
+router.get("/:slug", getBySlug)
 
-router.patch("/:id", upload.array("images", 10), update);
+router.get("/:id", getById)
 
-router.delete("/:id", remove);
+router.post("/", upload.array("images", 10), create)
 
-export default router;
+router.patch("/:id", upload.array("images", 10), update)
+
+router.delete("/:id", remove)
+
+export default router

@@ -1,6 +1,6 @@
 import { cn } from '#/lib/utils.ts'
 
-import { PawPrint } from 'lucide-react'
+import { Bird, Cat, Dog, Fish, PawPrint } from 'lucide-react'
 
 // ================================ Dashboard Settings Helper Functions ================================ //
 export function settingsCardClassName(extra?: string) {
@@ -89,4 +89,43 @@ export function publishedAtDisplay(post: BlogPost): string {
     month: 'short',
     year: 'numeric',
   })
+}
+
+// ================================ Category Helper Functions ================================ //
+export const CARD_STYLES = [
+  {
+    cardClass: 'bg-orange-50 border-orange-100/50',
+    chipClass: 'text-orange-600',
+    textClass: 'text-orange-600',
+  },
+  {
+    cardClass: 'bg-emerald-50 border-emerald-100/50',
+    chipClass: 'text-emerald-600',
+    textClass: 'text-emerald-600',
+  },
+  {
+    cardClass: 'bg-blue-50 border-blue-100/50',
+    chipClass: 'text-blue-600',
+    textClass: 'text-blue-600',
+  },
+  {
+    cardClass: 'bg-yellow-50 border-yellow-100/50',
+    chipClass: 'text-yellow-600',
+    textClass: 'text-yellow-600',
+  },
+] as const
+
+export function CategoryIcon({ kind }: { kind: string }) {
+  if (kind === 'dog') return <Dog size={16} />
+  if (kind === 'cat') return <Cat size={16} />
+  if (kind === 'fish') return <Fish size={16} />
+  return <Bird size={16} />
+}
+
+export function inferIconKind(name: string): string {
+  const v = name.toLowerCase()
+  if (v.includes('dog') || v.includes('anjing')) return 'dog'
+  if (v.includes('cat') || v.includes('kucing')) return 'cat'
+  if (v.includes('fish') || v.includes('ikan')) return 'fish'
+  return 'bird'
 }

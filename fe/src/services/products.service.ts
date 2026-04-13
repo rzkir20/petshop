@@ -34,13 +34,6 @@ const api = createRestCrudResource<Product, CreateProductInput, UpdateProductInp
     itemKey: 'product',
 })
 
-export type ListProductsResult = {
-    products: Product[]
-    total: number
-    page: number
-    limit: number
-}
-
 export async function listProducts(filters?: {
     category?: string
     q?: string
@@ -61,10 +54,21 @@ export async function listProducts(filters?: {
     const res = await requestJson<Record<string, unknown>>(
         `/products?${params.toString()}`,
     )
+    const products = Array.isArray(res.products)
+        ? (res.products as Array<Record<string, unknown>>).map((item) => ({
+            _id: String(item._id ?? ''),
+            title: String(item.title ?? ''),
+            slug: String(item.slug ?? ''),
+            thumbnail: String(item.thumbnail ?? ''),
+            price: Number(item.price) || 0,
+            isBestSeller: Boolean(item.isBestSeller),
+            category: String(item.category ?? ''),
+            createdAt: String(item.createdAt ?? ''),
+            updatedAt: String(item.updatedAt ?? ''),
+        }))
+        : []
     return {
-        products: Array.isArray(res.products)
-            ? (res.products as Product[])
-            : [],
+        products,
         total: Number(res.total) || 0,
         page: Number(res.page) || page,
         limit: Number(res.limit) || limit,
@@ -75,7 +79,9 @@ export async function getProduct(id: string): Promise<Product> {
     return api.get(id)
 }
 
-export async function createProduct(input: CreateProductInput): Promise<Product> {
+export async function createProduct(
+    input: CreateProductRequestInput,
+): Promise<Product> {
     const body = new FormData()
     body.set('title', input.title)
     body.set('slug', input.slug)
@@ -91,8 +97,30 @@ export async function createProduct(input: CreateProductInput): Promise<Product>
     body.set('stockMax', String(input.stockMax))
     body.set('reorder', input.reorder)
     body.set('thumbnail', input.thumbnail)
-    for (const file of input.imageFiles ?? []) {
-        body.append('images', file)
+    body.set('highlights', JSON.stringify(input.highlights))
+    const maxImages = 10
+    if (input.imageEntries !== undefined) {
+        if (input.imageEntries.length > maxImages) {
+            throw new Error('Maksimal 10 gambar')
+        }
+        const imageFilesOrdered: File[] = []
+        const manifest: Array<{ t: 'u'; v: string } | { t: 'f'; i: number }> = []
+        for (const e of input.imageEntries) {
+            if (e.kind === 'url') {
+                manifest.push({ t: 'u', v: e.url.trim() })
+            } else {
+                manifest.push({ t: 'f', i: imageFilesOrdered.length })
+                imageFilesOrdered.push(e.file)
+            }
+        }
+        body.set('imageManifest', JSON.stringify(manifest))
+        for (const file of imageFilesOrdered) {
+            body.append('images', file)
+        }
+    } else {
+        for (const file of input.imageFiles ?? []) {
+            body.append('images', file)
+        }
     }
     const res = await requestJson<Record<string, unknown>>('/products', {
         method: 'POST',
@@ -124,6 +152,9 @@ export async function updateProduct(
     if (input.stockMax !== undefined) body.set('stockMax', String(input.stockMax))
     if (input.reorder !== undefined) body.set('reorder', input.reorder)
     if (input.thumbnail !== undefined) body.set('thumbnail', input.thumbnail)
+    if (input.highlights !== undefined) {
+        body.set('highlights', JSON.stringify(input.highlights))
+    }
     if (input.images !== undefined) {
         body.set('images', JSON.stringify(input.images))
     }
@@ -144,23 +175,25 @@ export async function deleteProduct(id: string): Promise<void> {
     return api.remove(id)
 }
 
-function toRow(p: Product): ProductRow {
+function toRow(p: ProductListItem): ProductRow {
+    const resolvedId = String(p._id || '').trim() || p.slug
     return {
-        id: p._id,
+        id: resolvedId,
         title: p.title,
         slug: p.slug,
-        expiredAt: p.expiredAt,
-        flavor: p.flavor,
-        weight: p.weight,
+        createdAt: formatUpdatedAt(p.createdAt),
+        expiredAt: '',
+        flavor: '',
+        weight: '',
         thumbnail: p.thumbnail,
-        images: p.images,
+        images: p.thumbnail ? [p.thumbnail] : [],
         price: p.price,
-        content: p.content,
+        content: '',
         isBestSeller: p.isBestSeller,
-        stockCurrent: p.stockCurrent,
-        stockMax: p.stockMax,
-        reorder: p.reorder,
-        status: p.status,
+        stockCurrent: 0,
+        stockMax: 0,
+        reorder: '-',
+        status: 'in-stock',
         updated: formatUpdatedAt(p.updatedAt),
         category: p.category,
     }
@@ -322,7 +355,7 @@ export function useProductsCrudMutations() {
     const queryClient = useQueryClient()
 
     const create = useMutation({
-        mutationFn: (input: CreateProductInput) => createProduct(input),
+        mutationFn: (input: CreateProductRequestInput) => createProduct(input),
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: productsQueryKeys.list() })
         },
@@ -367,7 +400,7 @@ export function useProductCreateFormState() {
     const [weight, setWeight] = useState('')
     const [category, setCategory] = useState<ProductCategory>('')
     const [status, setStatus] = useState<StockStatus>('in-stock')
-    const [imageFiles, setImageFiles] = useState<File[]>([])
+    const [imageEntries, setImageEntries] = useState<ProductImageEntry[]>([])
     const [dragOverUpload, setDragOverUpload] = useState(false)
     const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(null)
     const fileInputRef = useRef<HTMLInputElement | null>(null)
@@ -377,6 +410,7 @@ export function useProductCreateFormState() {
     const [stockCurrent, setStockCurrent] = useState<number>(0)
     const [stockMax, setStockMax] = useState<number>(0)
     const [reorder, setReorder] = useState('')
+    const [highlightsText, setHighlightsText] = useState('')
 
     const categoryOptions = useMemo(() => {
         const rows = categoriesQuery.data ?? []
@@ -403,34 +437,68 @@ export function useProductCreateFormState() {
         [title, category],
     )
     const slug = useMemo(() => slugifyFromName(title), [title])
-    const thumbnailFromFile = useMemo(
-        () => slugifyFromName(imageFiles[0]?.name ?? ''),
-        [imageFiles],
-    )
+    const thumbnailFromFile = useMemo(() => {
+        const first = imageEntries.find((e) => e.kind === 'file')
+        return first ? slugifyFromName(first.file.name) : ''
+    }, [imageEntries])
     const effectiveThumbnail = (thumbnailFromFile || defaultThumbnail).slice(0, 64)
     const imagePreviews = useMemo(
         () =>
-            imageFiles.map((file) => ({
-                file,
-                url: URL.createObjectURL(file),
-            })),
-        [imageFiles],
+            imageEntries.map((e) =>
+                e.kind === 'url'
+                    ? { kind: 'url' as const, url: e.url, label: e.url }
+                    : {
+                        kind: 'file' as const,
+                        url: URL.createObjectURL(e.file),
+                        label: e.file.name,
+                        file: e.file,
+                    },
+            ),
+        [imageEntries],
     )
 
     useEffect(() => {
         return () => {
-            imagePreviews.forEach((item) => URL.revokeObjectURL(item.url))
+            imagePreviews.forEach((item) => {
+                if (item.kind === 'file') URL.revokeObjectURL(item.url)
+            })
         }
     }, [imagePreviews])
 
+    const maxImages = 10
+
     function appendFiles(files: File[]) {
         if (files.length === 0) return
-        setImageFiles((prev) => [...prev, ...files])
+        setImageEntries((prev) => {
+            const room = maxImages - prev.length
+            if (room <= 0) return prev
+            const next: ProductImageEntry[] = [...prev]
+            for (const file of files.slice(0, room)) {
+                next.push({ kind: 'file', file })
+            }
+            return next
+        })
+    }
+
+    function appendImageUrl(url: string) {
+        const trimmed = url.trim()
+        if (!trimmed) return
+        let parsed: URL
+        try {
+            parsed = new URL(trimmed)
+        } catch {
+            return
+        }
+        if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return
+        setImageEntries((prev) => {
+            if (prev.length >= maxImages) return prev
+            return [...prev, { kind: 'url', url: trimmed }]
+        })
     }
 
     function moveImage(from: number, to: number) {
         if (from === to) return
-        setImageFiles((prev) => {
+        setImageEntries((prev) => {
             if (from < 0 || from >= prev.length || to < 0 || to >= prev.length) return prev
             const next = [...prev]
             const [moved] = next.splice(from, 1)
@@ -439,7 +507,7 @@ export function useProductCreateFormState() {
         })
     }
 
-    const createInput: CreateProductInput = {
+    const createInput: CreateProductRequestInput = {
         title: title.trim(),
         slug,
         expiredAt,
@@ -453,8 +521,12 @@ export function useProductCreateFormState() {
         stockCurrent,
         stockMax,
         reorder: reorder.trim(),
+        highlights: highlightsText
+            .split('\n')
+            .map((v) => v.trim())
+            .filter(Boolean),
         thumbnail: effectiveThumbnail,
-        imageFiles,
+        imageEntries,
     }
 
     return {
@@ -484,8 +556,10 @@ export function useProductCreateFormState() {
         setStockMax,
         reorder,
         setReorder,
+        highlightsText,
+        setHighlightsText,
         slug,
-        imageFiles,
+        imageEntries,
         imagePreviews,
         fileInputRef,
         dragOverUpload,
@@ -493,8 +567,9 @@ export function useProductCreateFormState() {
         draggedImageIndex,
         setDraggedImageIndex,
         appendFiles,
+        appendImageUrl,
         moveImage,
-        setImageFiles,
+        setImageEntries,
         createInput,
     }
 }
@@ -527,6 +602,7 @@ export function useProductEditFormState(product: Product | null) {
     const [stockCurrent, setStockCurrent] = useState<number>(0)
     const [stockMax, setStockMax] = useState<number>(0)
     const [reorder, setReorder] = useState('')
+    const [highlightsText, setHighlightsText] = useState('')
 
     useEffect(() => {
         if (!product) return
@@ -544,6 +620,7 @@ export function useProductEditFormState(product: Product | null) {
         setStockCurrent(product.stockCurrent)
         setStockMax(product.stockMax)
         setReorder(product.reorder)
+        setHighlightsText(product.highlights.join('\n'))
     }, [product])
 
     const categoryOptions = useMemo(() => {
@@ -621,6 +698,10 @@ export function useProductEditFormState(product: Product | null) {
         stockCurrent,
         stockMax,
         reorder: reorder.trim(),
+        highlights: highlightsText
+            .split('\n')
+            .map((v) => v.trim())
+            .filter(Boolean),
         thumbnail: effectiveThumbnail,
         images: imageFiles.length === 0 ? images : undefined,
         imageFiles,
@@ -666,6 +747,8 @@ export function useProductEditFormState(product: Product | null) {
         setStockMax,
         reorder,
         setReorder,
+        highlightsText,
+        setHighlightsText,
         slug,
         effectiveThumbnail,
         imagePreviews,

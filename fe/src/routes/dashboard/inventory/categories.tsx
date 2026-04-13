@@ -133,6 +133,15 @@ function InventoryCategoriesPage() {
               />
             </div>
             <div>
+              <Label htmlFor="category-image">Gambar kategori</Label>
+              <Input
+                id="category-image"
+                name="image"
+                type="file"
+                accept="image/*"
+              />
+            </div>
+            <div>
               <Label htmlFor="category-status">Status</Label>
               <Select id="category-status" name="status" defaultValue="active">
                 <option value="active">Active</option>
@@ -216,6 +225,22 @@ function InventoryCategoriesPage() {
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
                     placeholder="Contoh: Semua kebutuhan makanan untuk kucing"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-category-image">Gambar kategori</Label>
+                  {editing.image ? (
+                    <img
+                      src={editing.image}
+                      alt={editing.name}
+                      className="h-20 w-20 rounded-xl border border-emerald-100 object-cover"
+                    />
+                  ) : null}
+                  <Input
+                    id="edit-category-image"
+                    name="image"
+                    type="file"
+                    accept="image/*"
                   />
                 </div>
                 <div>
@@ -373,6 +398,7 @@ function InventoryCategoriesPage() {
             <table className="w-full min-w-[680px] text-left">
               <thead>
                 <tr className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
+                  <th className="px-4 py-3">Image</th>
                   <th className="px-4 py-3">Category Name</th>
                   <th className="px-4 py-3">Description</th>
                   <th className="px-4 py-3 tabular-nums">Products</th>
@@ -386,7 +412,7 @@ function InventoryCategoriesPage() {
                 {filtered.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={7}
+                      colSpan={8}
                       className="px-4 py-12 text-center text-sm text-gray-500"
                     >
                       {items.length === 0
@@ -400,6 +426,17 @@ function InventoryCategoriesPage() {
                       key={category._id}
                       className="border-t border-emerald-50 text-sm text-gray-700"
                     >
+                      <td className="px-4 py-4">
+                        {category.image ? (
+                          <img
+                            src={category.image}
+                            alt={category.name}
+                            className="h-12 w-12 rounded-xl border border-emerald-100 object-cover"
+                          />
+                        ) : (
+                          <div className="h-12 w-12 rounded-xl border border-dashed border-emerald-100 bg-emerald-50/40" />
+                        )}
+                      </td>
                       <td className="px-4 py-4 font-semibold text-[#173a40]">
                         {category.name}
                       </td>

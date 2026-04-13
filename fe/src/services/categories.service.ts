@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { createRestCrudResource } from '#/services/crud.service'
+import { requestJson, createRestCrudResource } from '#/services/crud.service'
 
 import { slugifyFromName } from '#/hooks/slugify'
 
@@ -35,19 +35,39 @@ export async function getCategory(id: string): Promise<CategoryItem> {
 export async function createCategory(
     input: CreateCategoryPayload,
 ): Promise<CategoryItem> {
-    return categoriesApi.create({
-        name: input.name,
-        ...(input.description != null ? { description: input.description } : {}),
-        slug: input.slug,
-        ...(input.status != null ? { status: input.status } : {}),
+    const body = new FormData()
+    body.set('name', input.name)
+    body.set('slug', input.slug)
+    if (input.description != null) body.set('description', input.description)
+    if (input.status != null) body.set('status', input.status)
+    if (input.image != null) body.set('image', input.image)
+    if (input.imageFile != null) body.set('image', input.imageFile)
+    const res = await requestJson<Record<string, unknown>>('/categories', {
+        method: 'POST',
+        body,
     })
+    return res.category as CategoryItem
 }
 
 export async function updateCategory(
     id: string,
     input: UpdateCategoryPayload,
 ): Promise<CategoryItem> {
-    return categoriesApi.update(id, input)
+    const body = new FormData()
+    if (input.name != null) body.set('name', input.name)
+    if (input.slug != null) body.set('slug', input.slug)
+    if (input.description != null) body.set('description', input.description)
+    if (input.status != null) body.set('status', input.status)
+    if (input.image != null) body.set('image', input.image)
+    if (input.imageFile != null) body.set('image', input.imageFile)
+    const res = await requestJson<Record<string, unknown>>(
+        `/categories/${encodeURIComponent(id)}`,
+        {
+            method: 'PATCH',
+            body,
+        },
+    )
+    return res.category as CategoryItem
 }
 
 export async function deleteCategory(id: string): Promise<void> {
@@ -92,6 +112,7 @@ export function useCategoriesCrudState() {
                 _id: `optimistic-${Math.random().toString(16).slice(2)}`,
                 name: input.name,
                 description: input.description ?? '',
+                image: input.image ?? '',
                 count: 0,
                 slug: input.slug,
                 status: input.status ?? 'active',
@@ -138,7 +159,13 @@ export function useCategoriesCrudState() {
                         c._id === id
                             ? {
                                 ...c,
-                                ...input,
+                                ...(input.name !== undefined ? { name: input.name } : {}),
+                                ...(input.description !== undefined
+                                    ? { description: input.description }
+                                    : {}),
+                                ...(input.slug !== undefined ? { slug: input.slug } : {}),
+                                ...(input.status !== undefined ? { status: input.status } : {}),
+                                ...(input.image !== undefined ? { image: input.image } : {}),
                                 updatedAt: new Date().toISOString(),
                             }
                             : c,
@@ -245,10 +272,14 @@ export function useCategoriesCrudState() {
             const description = String(fd.get('description') ?? '').trim()
             const slug = String(fd.get('slug') ?? '').trim()
             const status = fd.get('status') as 'active' | 'inactive' | null
+            const imageFile = fd.get('image')
+            const file =
+                imageFile instanceof File && imageFile.size > 0 ? imageFile : null
             createMutation.mutate({
                 name,
                 description,
                 slug,
+                imageFile: file,
                 status:
                     status === 'inactive'
                         ? 'inactive'
@@ -269,9 +300,12 @@ export function useCategoriesCrudState() {
             const description = String(fd.get('description') ?? '').trim()
             const slug = String(fd.get('slug') ?? '').trim()
             const status = fd.get('status') as 'active' | 'inactive'
+            const imageFile = fd.get('image')
+            const file =
+                imageFile instanceof File && imageFile.size > 0 ? imageFile : null
             updateMutation.mutate({
                 id: editing._id,
-                input: { name, description, slug, status },
+                input: { name, description, slug, status, imageFile: file },
             })
         },
         [editing, updateMutation],

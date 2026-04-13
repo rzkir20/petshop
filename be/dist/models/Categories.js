@@ -13,6 +13,7 @@ const mongoose_1 = require("mongoose");
 const categorySchema = new mongoose_1.Schema({
     name: { type: String, required: true, trim: true },
     description: { type: String, trim: true, default: "" },
+    image: { type: String, trim: true, default: "" },
     count: { type: Number, min: 0, default: 0 },
     slug: {
         type: String,
@@ -58,6 +59,7 @@ async function createCategory(input) {
         name: String(input.name || "").trim(),
         description: String(input.description || "").trim(),
         slug: normalizeSlug(input.slug),
+        image: String(input.image || "").trim(),
         status: input.status === "inactive" ? "inactive" : "active",
     });
     return created.toObject();
@@ -74,6 +76,9 @@ async function updateCategory(id, input) {
     }
     if (input.slug !== undefined) {
         $set.slug = normalizeSlug(input.slug);
+    }
+    if (input.image !== undefined) {
+        $set.image = String(input.image || "").trim();
     }
     if (input.status !== undefined) {
         $set.status = input.status === "inactive" ? "inactive" : "active";
@@ -104,6 +109,7 @@ function toPublic(category) {
         _id: String(category._id || ""),
         name: category.name,
         description: category.description,
+        image: category.image,
         count: Number(category.count || 0),
         slug: category.slug,
         status: category.status,

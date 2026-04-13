@@ -13,31 +13,16 @@ import {
   Truck,
 } from 'lucide-react'
 
+import { fetchProductBySlug } from '#/lib/FetchData'
+
 const createShopSlugRoute = createFileRoute as any
 export const Route = createShopSlugRoute('/shop/$slug')({
+  loader: async ({ params }: { params: { slug: string } }) => {
+    const product = await fetchProductBySlug(params.slug)
+    return { product }
+  },
   component: RouteComponent,
 })
-
-const product = {
-  slug: 'premium-grain-free-salmon-dog-food',
-  category: 'Dogs',
-  subCategory: 'Food',
-  title: 'Premium Grain-Free Salmon & Sweet Potato Dog Food',
-  price: '$54.99',
-  oldPrice: '$69.99',
-  discount: '20% OFF',
-  status: 'IN STOCK',
-  badge: 'BEST SELLER',
-  reviews: '(1,248 Verified Reviews)',
-  mainImage:
-    'https://images.unsplash.com/photo-1583947581924-860bda6a26df?auto=format&fit=crop&w=1000&q=80',
-  gallery: [
-    'https://images.unsplash.com/photo-1583947581924-860bda6a26df?auto=format&fit=crop&w=200&q=80',
-    'https://images.unsplash.com/photo-1589924691995-400dc9cec109?auto=format&fit=crop&w=200&q=80',
-    'https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?auto=format&fit=crop&w=200&q=80',
-    'https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&w=200&q=80',
-  ],
-}
 
 const relatedProducts = [
   {
@@ -84,6 +69,30 @@ const relatedProducts = [
 
 function RouteComponent() {
   const { slug } = Route.useParams()
+  const { product } = Route.useLoaderData()
+  const categoryLabel = product?.category || 'Shop'
+  const productTitle = product?.title || 'Product'
+  const productImage =
+    product?.thumbnail ||
+    'https://images.unsplash.com/photo-1583947581924-860bda6a26df?auto=format&fit=crop&w=1000&q=80'
+  const productGallery =
+    product && product.images.length > 0
+      ? [productImage, ...product.images.filter((img: string) => img !== productImage)].slice(
+          0,
+          4,
+        )
+      : [productImage, productImage, productImage, productImage]
+  const displayPrice = product ? `$${product.price.toFixed(2)}` : '-'
+  const oldPrice = product ? `$${(product.price * 1.2).toFixed(2)}` : '-'
+  const discount = product ? '20% OFF' : '-'
+  const statusLabel =
+    product?.status === 'out-of-stock'
+      ? 'OUT OF STOCK'
+      : product?.status === 'low-stock'
+        ? 'LOW STOCK'
+        : product
+          ? 'IN STOCK'
+          : 'UNAVAILABLE'
 
   return (
     <main className="mx-auto w-full max-w-full bg-white px-4 py-8 text-slate-900 sm:px-6 lg:px-8 xl:container">
@@ -102,13 +111,13 @@ function RouteComponent() {
               to="/shop"
               className="transition-colors hover:text-emerald-500"
             >
-              {product.category}
+              {categoryLabel}
             </Link>
           </li>
           <li>
             <ChevronRight className="h-4 w-4" />
           </li>
-          <li className="text-slate-900">{product.subCategory}</li>
+          <li className="text-slate-900">{categoryLabel}</li>
         </ol>
       </nav>
 
@@ -116,8 +125,8 @@ function RouteComponent() {
         <div className="space-y-6">
           <div className="group relative aspect-square overflow-hidden rounded-[3rem] bg-slate-100">
             <img
-              src={product.mainImage}
-              alt={product.title}
+              src={productImage}
+              alt={productTitle}
               className="h-full w-full object-cover"
             />
             <button
@@ -128,7 +137,7 @@ function RouteComponent() {
             </button>
           </div>
           <div className="grid grid-cols-4 gap-4">
-            {product.gallery.map((image, index) => (
+            {productGallery.map((image: string, index: number) => (
               <button
                 key={image}
                 type="button"
@@ -148,14 +157,14 @@ function RouteComponent() {
           <div className="flex-1">
             <div className="mb-4 flex items-center gap-3">
               <span className="rounded-full bg-orange-500 px-3 py-1 text-xs font-bold tracking-wide text-white">
-                {product.badge}
+                {product?.isBestSeller ? 'BEST SELLER' : 'PRODUCT'}
               </span>
               <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-600">
-                {product.status}
+                {statusLabel}
               </span>
             </div>
             <h1 className="mb-4 text-4xl leading-tight font-bold text-slate-900 lg:text-5xl">
-              {product.title}
+              {productTitle}
             </h1>
             <div className="mb-6 flex items-center gap-4">
               <div className="flex items-center gap-1 text-orange-400">
@@ -164,18 +173,18 @@ function RouteComponent() {
                 ))}
               </div>
               <span className="font-medium text-slate-500">
-                {product.reviews}
+                {product ? '(Verified Product)' : '(Not Found)'}
               </span>
             </div>
             <div className="mb-8 flex items-baseline gap-4">
               <span className="text-4xl font-bold text-emerald-600">
-                {product.price}
+                {displayPrice}
               </span>
               <span className="text-xl text-slate-400 line-through">
-                {product.oldPrice}
+                {oldPrice}
               </span>
               <span className="rounded-lg bg-orange-50 px-2 py-1 text-sm font-bold text-orange-500">
-                {product.discount}
+                {discount}
               </span>
             </div>
 
@@ -277,15 +286,14 @@ function RouteComponent() {
               Wholesome Nutrition for Your Best Friend
             </h2>
             <p className="text-lg leading-relaxed text-slate-600">
-              Our Premium Grain-Free Salmon & Sweet Potato recipe is crafted for
-              adult dogs of all breeds. We use sustainably sourced salmon as the
-              single animal protein source, making it an excellent choice for
-              dogs with food sensitivities.
+              {product?.content
+                ? product.content.replace(/<[^>]+>/g, '').trim() ||
+                  'Deskripsi produk belum tersedia.'
+                : 'Deskripsi produk belum tersedia.'}
             </p>
             <p className="text-lg leading-relaxed text-slate-600">
-              Rich in Omega-3 fatty acids, this formula supports healthy skin
-              and a shiny coat. Sweet potatoes provide highly digestible energy,
-              while antioxidant-rich ingredients support immunity.
+              Produk ini memiliki varian rasa {product?.flavor || '-'} dengan
+              ukuran {product?.weight || '-'}.
             </p>
             <div className="mt-10 grid gap-8 sm:grid-cols-2">
               <div className="rounded-[2.5rem] bg-orange-50 p-8">
@@ -395,9 +403,9 @@ function RouteComponent() {
         </div>
       </section>
 
-      {slug !== product.slug ? (
+      {product == null ? (
         <p className="mt-8 text-center text-sm text-slate-400">
-          You are viewing placeholder content for slug: <b>{slug}</b>
+          Produk dengan slug <b>{slug}</b> tidak ditemukan.
         </p>
       ) : null}
     </main>

@@ -11,6 +11,7 @@ interface Product {
   weight: string;
   thumbnail: string;
   images: string[];
+  highlights: string[];
   price: number;
   content: string;
   isBestSeller: boolean;
@@ -31,6 +32,7 @@ type CreateProductBody = {
   weight: string;
   thumbnail?: string;
   images?: string[];
+  highlights?: string[];
   price: number;
   content: string;
   isBestSeller?: boolean;
@@ -51,6 +53,7 @@ type CreateProductInput = {
   weight: string;
   thumbnail?: string;
   images?: string[];
+  highlights?: string[];
   price: number;
   content: string;
   isBestSeller?: boolean;

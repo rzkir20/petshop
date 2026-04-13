@@ -10,82 +10,32 @@ import {
   Star,
 } from 'lucide-react'
 
-const categoryFilters = [
-  { label: 'All Pets', count: 248, checked: true },
-  { label: 'Dogs', count: 112, checked: false },
-  { label: 'Cats', count: 84, checked: false },
-  { label: 'Birds', count: 32, checked: false },
-  { label: 'Fish & Aquatic', count: 20, checked: false },
-]
-
-const products = [
-  {
-    slug: 'premium-grain-free-salmon-dog-food',
-    title: 'Premium Grain-Free Salmon Dog Food',
-    price: '$45.99',
-    category: 'Dogs • 12kg Pack',
-    ratingText: '(1.2k)',
-    image:
-      'https://images.unsplash.com/photo-1583947581924-860bda6a26df?auto=format&fit=crop&w=600&q=80',
-    badge: 'Best Seller',
-  },
-  {
-    slug: 'smart-interactive-laser-toy',
-    title: 'Smart Interactive Laser Toy',
-    price: '$24.50',
-    category: 'Cats • Toys',
-    ratingText: '(842)',
-    image:
-      'https://images.unsplash.com/photo-1591768793355-74d7c836049c?auto=format&fit=crop&w=600&q=80',
-    badge: '',
-  },
-  {
-    slug: 'orthopedic-memory-foam-bed',
-    title: 'Orthopedic Memory Foam Bed',
-    price: '$89.00',
-    category: 'Dogs/Cats • Accessories',
-    ratingText: '(512)',
-    image:
-      'https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&w=600&q=80',
-    badge: 'New',
-  },
-  {
-    slug: 'reflective-heavy-duty-leash',
-    title: 'Reflective Heavy-Duty Leash',
-    price: '$18.99',
-    category: 'Dogs • Accessories',
-    ratingText: '(215)',
-    image:
-      'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=600&q=80',
-    badge: '',
-  },
-  {
-    slug: 'modern-parakeet-flight-cage',
-    title: 'Modern Parakeet Flight Cage',
-    price: '$125.00',
-    category: 'Birds • Cages',
-    ratingText: '(128)',
-    image:
-      'https://images.unsplash.com/photo-1581281863883-2469417a1668?auto=format&fit=crop&w=600&q=80',
-    badge: '',
-  },
-  {
-    slug: '20-gallon-glass-starter-kit',
-    title: '20-Gallon Glass Starter Kit',
-    price: '$95.00',
-    category: 'Fish • Aquariums',
-    ratingText: '(340)',
-    image:
-      'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=600&q=80',
-    badge: 'Best Seller',
-  },
-]
+import { fetchCategories, fetchProducts } from '#/lib/FetchData'
 
 export const Route = createFileRoute('/shop/')({
+  loader: async () => {
+    const products = await fetchProducts('/products?page=1&limit=12')
+    const categories = await fetchCategories('/categories')
+    return { products, categories }
+  },
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const { products, categories } = Route.useLoaderData()
+  const activeCategories = categories.filter((c) => c.status === 'active')
+  const categoryFilters = [
+    {
+      label: 'All Pets',
+      count: activeCategories.reduce((acc, c) => acc + c.count, 0),
+      checked: true,
+    },
+    ...activeCategories.map((c) => ({
+      label: c.name,
+      count: c.count,
+      checked: false,
+    })),
+  ]
   return (
     <>
       <section className="bg-emerald-50/50 py-10">
@@ -212,7 +162,7 @@ function RouteComponent() {
 
               <div className="flex items-center gap-4">
                 <span className="text-sm whitespace-nowrap text-slate-500">
-                  Showing 1-12 of 248 products
+                  Showing {products.length} products
                 </span>
                 <div className="relative">
                   <select className="cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white px-6 py-3.5 pr-12 font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500">
@@ -230,20 +180,24 @@ function RouteComponent() {
             <div className="mb-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {products.map((product) => (
                 <article
-                  key={product.title}
+                  key={product.slug}
                   className="product-card group rounded-[2.5rem] border border-slate-100 bg-white p-4 transition-all hover:shadow-2xl hover:shadow-emerald-100/50"
                 >
                   <div className="relative aspect-square overflow-hidden rounded-4xl bg-slate-100">
                     <a href={`/shop/${product.slug}`}>
                       <img
-                        src={product.image}
+                        src={
+                          product.thumbnail.startsWith('http')
+                            ? product.thumbnail
+                            : `https://api.dicebear.com/7.x/shapes/svg?seed=${product.slug}`
+                        }
                         alt={product.title}
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                       />
                     </a>
-                    {product.badge ? (
+                    {product.isBestSeller ? (
                       <div className="absolute top-4 left-4 rounded-full bg-orange-500 px-3 py-1 text-xs font-bold text-white">
-                        {product.badge}
+                        Best Seller
                       </div>
                     ) : null}
                     <div className="cart-btn absolute inset-x-4 bottom-4">
@@ -266,7 +220,7 @@ function RouteComponent() {
                         {product.title}
                       </a>
                       <span className="text-xl font-bold whitespace-nowrap text-emerald-600">
-                        {product.price}
+                        Rp {product.price.toLocaleString('id-ID')}
                       </span>
                     </div>
                     <p className="mb-3 text-sm font-medium text-slate-500">
@@ -278,7 +232,7 @@ function RouteComponent() {
                       ))}
                       <Star size={16} />
                       <span className="ml-1 text-xs font-bold text-slate-400">
-                        {product.ratingText}
+                        (-)
                       </span>
                     </div>
                   </div>

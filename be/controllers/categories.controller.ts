@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 
 import * as Categories from "../models/Categories";
 
-import { parseUpdateCategoryBody } from "../hooks/helper";
+import { parseUpdateCategoryBody, uploadImageToImageKit } from "../hooks/helper";
 
 export async function list(_req: Request, res: Response) {
   try {
@@ -34,17 +34,24 @@ export async function getById(req: Request, res: Response) {
 export async function create(req: Request, res: Response) {
   try {
     await Categories.ensureIndexes();
-    const { name, description, slug, status } = (req.body || {}) as {
+    const file = req.file;
+    const { name, description, slug, image, status } = (req.body || {}) as {
       name?: string;
       description?: string;
       slug?: string;
+      image?: string;
       status?: string;
     };
+    let resolvedImage = String(image || "");
+    if (file) {
+      resolvedImage = await uploadImageToImageKit(file, { folder: "/categories" });
+    }
 
     const row = await Categories.createCategory({
       name: String(name || ""),
       description: String(description || ""),
       slug: String(slug || ""),
+      image: resolvedImage,
       status:
         status === "inactive"
           ? "inactive"
@@ -58,6 +65,9 @@ export async function create(req: Request, res: Response) {
       category: Categories.toPublic(row),
     });
   } catch (err: unknown) {
+    if (err instanceof Error && err.message === "ImageKit is not configured") {
+      return res.status(500).json({ message: "ImageKit is not configured" });
+    }
     if (
       typeof err === "object" &&
       err !== null &&
@@ -74,11 +84,16 @@ export async function create(req: Request, res: Response) {
 export async function update(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const parsed = parseUpdateCategoryBody(req.body);
+    const file = req.file;
+    let parsed = parseUpdateCategoryBody(req.body);
+    if (file) {
+      const image = await uploadImageToImageKit(file, { folder: "/categories" });
+      parsed = { ...(parsed ?? {}), image };
+    }
     if (!parsed) {
       return res.status(400).json({
         message:
-          "Provide at least one valid field: name (non-empty), description (string), slug (valid format), or status (active|inactive)",
+          "Provide at least one valid field: name (non-empty), description (string), slug (valid format), image (string), or status (active|inactive)",
       });
     }
 
@@ -97,6 +112,9 @@ export async function update(req: Request, res: Response) {
       category: Categories.toPublic(row),
     });
   } catch (err: unknown) {
+    if (err instanceof Error && err.message === "ImageKit is not configured") {
+      return res.status(500).json({ message: "ImageKit is not configured" });
+    }
     if (
       typeof err === "object" &&
       err !== null &&

@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 
-import { useId } from 'react'
+import { useId, useState } from 'react'
 
 import { Input } from '#/components/ui/input'
 
@@ -24,9 +24,11 @@ export const Route = createFileRoute('/dashboard/inventory/create')({
 function RouteComponent() {
   const navigate = useNavigate()
   const titleId = useId()
+  const [imageUrlDraft, setImageUrlDraft] = useState('')
   const { create } = useProductsCrudMutations()
   const form = useProductCreateFormState()
   const categoriesLoading = form.categoriesQuery.isPending
+  const imageSlotsFull = form.imageEntries.length >= 10
 
   return (
     <div className="space-y-6 p-8">
@@ -240,48 +242,107 @@ function RouteComponent() {
             </div>
 
             <div className="md:col-span-2">
-              <Label htmlFor="product-image-file">Product images</Label>
-              <input
-                ref={form.fileInputRef}
-                id="product-image-file"
-                type="file"
-                multiple
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  form.appendFiles(Array.from(e.target.files ?? []))
-                  e.currentTarget.value = ''
-                }}
+              <Label htmlFor="product-highlights">Highlights</Label>
+              <textarea
+                id="product-highlights"
+                value={form.highlightsText}
+                onChange={(e) => form.setHighlightsText(e.target.value)}
+                placeholder={'Satu highlight per baris\nContoh: Real Tuna #1 Ingredient'}
+                className="mt-2 min-h-28 w-full rounded-xl border border-emerald-100 px-3 py-2 text-sm outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
               />
-              <button
-                type="button"
-                onClick={() => form.fileInputRef.current?.click()}
-                onDragOver={(e) => {
-                  e.preventDefault()
-                  form.setDragOverUpload(true)
-                }}
-                onDragLeave={() => form.setDragOverUpload(false)}
-                onDrop={(e) => {
-                  e.preventDefault()
-                  form.setDragOverUpload(false)
-                  form.appendFiles(Array.from(e.dataTransfer.files))
-                }}
-                className={`w-full rounded-xl border-2 border-dashed px-4 py-6 text-sm transition ${
-                  form.dragOverUpload
-                    ? 'border-emerald-400 bg-emerald-50 text-emerald-700'
-                    : 'border-emerald-200 bg-white text-gray-500 hover:bg-emerald-50'
-                }`}
-              >
-                Drag & drop images here, atau klik untuk pilih file
-              </button>
-              <p className="mt-1 text-xs text-gray-400">
-                Pilih satu atau lebih gambar (opsional).
-              </p>
+            </div>
+
+            <div className="md:col-span-2 space-y-4">
+              <div>
+                <Label htmlFor="product-image-url">Gambar dari URL</Label>
+                <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+                  <Input
+                    id="product-image-url"
+                    type="url"
+                    inputMode="url"
+                    autoComplete="off"
+                    placeholder="https://contoh.com/gambar.jpg"
+                    value={imageUrlDraft}
+                    disabled={imageSlotsFull}
+                    onChange={(e) => setImageUrlDraft(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key !== 'Enter') return
+                      e.preventDefault()
+                      form.appendImageUrl(imageUrlDraft)
+                      setImageUrlDraft('')
+                    }}
+                    className="sm:flex-1"
+                  />
+                  <button
+                    type="button"
+                    disabled={imageSlotsFull || !imageUrlDraft.trim()}
+                    onClick={() => {
+                      form.appendImageUrl(imageUrlDraft)
+                      setImageUrlDraft('')
+                    }}
+                    className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50 disabled:opacity-50"
+                  >
+                    Tambah URL
+                  </button>
+                </div>
+                <p className="mt-1 text-xs text-gray-400">
+                  URL harus http atau https. Maks. 10 gambar total (URL + file).
+                </p>
+              </div>
+
+              <div>
+                <Label htmlFor="product-image-file">Unggah gambar dari file</Label>
+                <input
+                  ref={form.fileInputRef}
+                  id="product-image-file"
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  className="hidden"
+                  disabled={imageSlotsFull}
+                  onChange={(e) => {
+                    form.appendFiles(Array.from(e.target.files ?? []))
+                    e.currentTarget.value = ''
+                  }}
+                />
+                <button
+                  type="button"
+                  disabled={imageSlotsFull}
+                  onClick={() => form.fileInputRef.current?.click()}
+                  onDragOver={(e) => {
+                    e.preventDefault()
+                    if (!imageSlotsFull) form.setDragOverUpload(true)
+                  }}
+                  onDragLeave={() => form.setDragOverUpload(false)}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    form.setDragOverUpload(false)
+                    if (imageSlotsFull) return
+                    form.appendFiles(Array.from(e.dataTransfer.files))
+                  }}
+                  className={`mt-2 w-full rounded-xl border-2 border-dashed px-4 py-6 text-sm transition ${
+                    form.dragOverUpload
+                      ? 'border-emerald-400 bg-emerald-50 text-emerald-700'
+                      : 'border-emerald-200 bg-white text-gray-500 hover:bg-emerald-50'
+                  } disabled:cursor-not-allowed disabled:opacity-50`}
+                >
+                  Drag & drop di sini, atau klik untuk pilih file
+                </button>
+                <p className="mt-1 text-xs text-gray-400">
+                  Boleh campur URL dan file; urutan di bawah = urutan di toko
+                  (yang pertama = thumbnail).
+                </p>
+              </div>
+
               {form.imagePreviews.length > 0 ? (
-                <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
+                <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                   {form.imagePreviews.map((item, index) => (
                     <div
-                      key={`${item.file.name}-${index}`}
+                      key={
+                        item.kind === 'file'
+                          ? `${item.file.name}-${index}`
+                          : `${item.url}-${index}`
+                      }
                       draggable
                       onDragStart={() => form.setDraggedImageIndex(index)}
                       onDragOver={(e) => e.preventDefault()}
@@ -294,16 +355,21 @@ function RouteComponent() {
                     >
                       <img
                         src={item.url}
-                        alt={item.file.name}
+                        alt={item.label}
                         className="h-24 w-full object-cover"
                       />
-                      <div className="px-2 py-1 text-[10px] text-gray-500">
-                        {index === 0 ? 'Thumbnail' : `Image ${index + 1}`}
+                      <div className="flex items-center justify-between gap-1 px-2 py-1 text-[10px] text-gray-500">
+                        <span>
+                          {index === 0 ? 'Thumbnail' : `#${index + 1}`}
+                        </span>
+                        <span className="shrink-0 rounded bg-emerald-50 px-1 text-emerald-700">
+                          {item.kind === 'url' ? 'URL' : 'File'}
+                        </span>
                       </div>
                       <button
                         type="button"
                         onClick={() =>
-                          form.setImageFiles((prev) =>
+                          form.setImageEntries((prev) =>
                             prev.filter((_, i) => i !== index),
                           )
                         }

@@ -70,11 +70,17 @@ async function getById(req, res) {
 async function create(req, res) {
     try {
         await Categories.ensureIndexes();
-        const { name, description, slug, status } = (req.body || {});
+        const file = req.file;
+        const { name, description, slug, image, status } = (req.body || {});
+        let resolvedImage = String(image || "");
+        if (file) {
+            resolvedImage = await (0, helper_1.uploadImageToImageKit)(file, { folder: "/categories" });
+        }
         const row = await Categories.createCategory({
             name: String(name || ""),
             description: String(description || ""),
             slug: String(slug || ""),
+            image: resolvedImage,
             status: status === "inactive"
                 ? "inactive"
                 : status === "active"
@@ -87,6 +93,9 @@ async function create(req, res) {
         });
     }
     catch (err) {
+        if (err instanceof Error && err.message === "ImageKit is not configured") {
+            return res.status(500).json({ message: "ImageKit is not configured" });
+        }
         if (typeof err === "object" &&
             err !== null &&
             "code" in err &&
@@ -100,10 +109,15 @@ async function create(req, res) {
 async function update(req, res) {
     try {
         const { id } = req.params;
-        const parsed = (0, helper_1.parseUpdateCategoryBody)(req.body);
+        const file = req.file;
+        let parsed = (0, helper_1.parseUpdateCategoryBody)(req.body);
+        if (file) {
+            const image = await (0, helper_1.uploadImageToImageKit)(file, { folder: "/categories" });
+            parsed = { ...(parsed ?? {}), image };
+        }
         if (!parsed) {
             return res.status(400).json({
-                message: "Provide at least one valid field: name (non-empty), description (string), slug (valid format), or status (active|inactive)",
+                message: "Provide at least one valid field: name (non-empty), description (string), slug (valid format), image (string), or status (active|inactive)",
             });
         }
         const existing = await Categories.findById(String(id || ""));
@@ -120,6 +134,9 @@ async function update(req, res) {
         });
     }
     catch (err) {
+        if (err instanceof Error && err.message === "ImageKit is not configured") {
+            return res.status(500).json({ message: "ImageKit is not configured" });
+        }
         if (typeof err === "object" &&
             err !== null &&
             "code" in err &&

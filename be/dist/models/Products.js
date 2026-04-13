@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ensureIndexes = ensureIndexes;
 exports.listProducts = listProducts;
 exports.findById = findById;
+exports.findBySlug = findBySlug;
 exports.createProduct = createProduct;
 exports.updateProduct = updateProduct;
 exports.deleteProduct = deleteProduct;
@@ -16,6 +17,7 @@ const productSchema = new mongoose_1.Schema({
     weight: { type: String, required: true, trim: true },
     thumbnail: { type: String, default: "", trim: true },
     images: { type: [String], default: [] },
+    highlights: { type: [String], default: [] },
     price: { type: Number, required: true, min: 0 },
     content: { type: String, required: true, trim: true },
     isBestSeller: { type: Boolean, default: false },
@@ -84,7 +86,15 @@ async function findById(id) {
     const doc = await ProductModel.findById(id).lean();
     return doc;
 }
+async function findBySlug(slug) {
+    const normalized = slugify(slug);
+    if (!normalized)
+        return null;
+    const doc = await ProductModel.findOne({ slug: normalized }).lean();
+    return doc;
+}
 async function createProduct(input) {
+    const highlightsInput = input.highlights;
     const created = await ProductModel.create({
         title: String(input.title || "").trim(),
         slug: slugify(input.slug || input.title),
@@ -94,6 +104,9 @@ async function createProduct(input) {
         thumbnail: String(input.thumbnail || "").trim(),
         images: Array.isArray(input.images)
             ? input.images.map((url) => String(url || "").trim()).filter(Boolean)
+            : [],
+        highlights: Array.isArray(highlightsInput)
+            ? highlightsInput.map((v) => String(v || "").trim()).filter(Boolean)
             : [],
         price: Number(input.price || 0),
         content: String(input.content || "").trim(),
@@ -110,6 +123,7 @@ async function updateProduct(id, input) {
     if (!mongoose_1.Types.ObjectId.isValid(id))
         return null;
     const $set = {};
+    const highlightsInput = input.highlights;
     if (input.title !== undefined)
         $set.title = String(input.title || "").trim();
     if (input.slug !== undefined)
@@ -129,6 +143,11 @@ async function updateProduct(id, input) {
     if (input.images !== undefined) {
         $set.images = Array.isArray(input.images)
             ? input.images.map((url) => String(url || "").trim()).filter(Boolean)
+            : [];
+    }
+    if (highlightsInput !== undefined) {
+        $set.highlights = Array.isArray(highlightsInput)
+            ? highlightsInput.map((v) => String(v || "").trim()).filter(Boolean)
             : [];
     }
     if (input.price !== undefined) {
@@ -177,6 +196,7 @@ function toPublic(product) {
         weight: product.weight,
         thumbnail: product.thumbnail,
         images: Array.isArray(product.images) ? product.images : [],
+        highlights: Array.isArray(product.highlights) ? product.highlights : [],
         price: product.price,
         content: product.content,
         isBestSeller: product.isBestSeller,

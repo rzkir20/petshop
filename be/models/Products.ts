@@ -16,6 +16,7 @@ const productSchema = new Schema(
     weight: { type: String, required: true, trim: true },
     thumbnail: { type: String, default: "", trim: true },
     images: { type: [String], default: [] },
+    highlights: { type: [String], default: [] },
     price: { type: Number, required: true, min: 0 },
     content: { type: String, required: true, trim: true },
     isBestSeller: { type: Boolean, default: false },
@@ -99,9 +100,17 @@ export async function findById(id: string): Promise<ProductDocument | null> {
   return doc as ProductDocument | null;
 }
 
+export async function findBySlug(slug: string): Promise<ProductDocument | null> {
+  const normalized = slugify(slug);
+  if (!normalized) return null;
+  const doc = await ProductModel.findOne({ slug: normalized }).lean();
+  return doc as ProductDocument | null;
+}
+
 export async function createProduct(
   input: CreateProductInput,
 ): Promise<ProductDocument> {
+  const highlightsInput = (input as { highlights?: unknown }).highlights;
   const created = await ProductModel.create({
     title: String(input.title || "").trim(),
     slug: slugify(input.slug || input.title),
@@ -111,6 +120,9 @@ export async function createProduct(
     thumbnail: String(input.thumbnail || "").trim(),
     images: Array.isArray(input.images)
       ? input.images.map((url) => String(url || "").trim()).filter(Boolean)
+      : [],
+    highlights: Array.isArray(highlightsInput)
+      ? highlightsInput.map((v: unknown) => String(v || "").trim()).filter(Boolean)
       : [],
     price: Number(input.price || 0),
     content: String(input.content || "").trim(),
@@ -132,6 +144,7 @@ export async function updateProduct(
   if (!Types.ObjectId.isValid(id)) return null;
 
   const $set: Record<string, unknown> = {};
+  const highlightsInput = (input as { highlights?: unknown }).highlights;
 
   if (input.title !== undefined) $set.title = String(input.title || "").trim();
   if (input.slug !== undefined) $set.slug = slugify(input.slug);
@@ -150,6 +163,11 @@ export async function updateProduct(
   if (input.images !== undefined) {
     $set.images = Array.isArray(input.images)
       ? input.images.map((url) => String(url || "").trim()).filter(Boolean)
+      : [];
+  }
+  if (highlightsInput !== undefined) {
+    $set.highlights = Array.isArray(highlightsInput)
+      ? highlightsInput.map((v: unknown) => String(v || "").trim()).filter(Boolean)
       : [];
   }
   if (input.price !== undefined) {
@@ -203,6 +221,7 @@ export function toPublic(product: ProductDocument | null) {
     weight: product.weight,
     thumbnail: product.thumbnail,
     images: Array.isArray(product.images) ? product.images : [],
+    highlights: Array.isArray(product.highlights) ? product.highlights : [],
     price: product.price,
     content: product.content,
     isBestSeller: product.isBestSeller,

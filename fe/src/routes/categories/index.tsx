@@ -1,79 +1,29 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { ArrowRight, Bird, Cat, Dog, Fish } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
+
+import { fetchCategories } from '#/lib/FetchData'
+
+import {
+  CARD_STYLES,
+  CategoryIcon,
+  inferIconKind,
+} from '#/components/ui/helper'
 
 const createCategoriesRoute = createFileRoute as any
 export const Route = createCategoriesRoute('/categories/')({
+  loader: async () => {
+    const categories = await fetchCategories('/categories')
+    return { categories }
+  },
   component: RouteComponent,
 })
 
-const categories = [
-  {
-    id: 'dogs',
-    title: 'For Dogs',
-    count: '1.2k+ Products',
-    description:
-      'From premium kibble to chew-proof toys and cozy memory foam beds, find everything your loyal companion needs to thrive.',
-    image:
-      'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=600&q=80',
-    href: '/categories/dogs',
-    cardClass: 'bg-orange-50 border-orange-100/50',
-    chipClass: 'text-orange-600',
-    textClass: 'text-orange-600',
-    icon: 'dog',
-  },
-  {
-    id: 'cats',
-    title: 'For Cats',
-    count: '850+ Products',
-    description:
-      "Discover elegant scratchers, grain-free nutrition, and interactive toys designed to satisfy your cat's natural instincts.",
-    image:
-      'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=600&q=80',
-    href: '/categories/cats',
-    cardClass: 'bg-emerald-50 border-emerald-100/50',
-    chipClass: 'text-emerald-600',
-    textClass: 'text-emerald-600',
-    icon: 'cat',
-  },
-  {
-    id: 'fish',
-    title: 'Fish & Aquatic',
-    count: '420+ Products',
-    description:
-      'Create a vibrant underwater world with our high-tech filtration systems, decorative plants, and premium aquatic nutrition.',
-    image:
-      'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=600&q=80',
-    href: '/categories/fish',
-    cardClass: 'bg-blue-50 border-blue-100/50',
-    chipClass: 'text-blue-600',
-    textClass: 'text-blue-600',
-    icon: 'fish',
-  },
-  {
-    id: 'birds',
-    title: 'For Birds',
-    count: '300+ Products',
-    description:
-      'Keep your feathered friends singing with organic seed mixes, spacious flight cages, and interactive enrichment toys.',
-    image:
-      'https://images.unsplash.com/photo-1552728089-57bdde30fc3a?auto=format&fit=crop&w=600&q=80',
-    href: '/categories/birds',
-    cardClass: 'bg-yellow-50 border-yellow-100/50',
-    chipClass: 'text-yellow-600',
-    textClass: 'text-yellow-600',
-    icon: 'bird',
-  },
-]
-
-function CategoryIcon({ kind }: { kind: string }) {
-  if (kind === 'dog') return <Dog size={16} />
-  if (kind === 'cat') return <Cat size={16} />
-  if (kind === 'fish') return <Fish size={16} />
-  return <Bird size={16} />
-}
-
 function RouteComponent() {
+  const { categories } = Route.useLoaderData()
+  const activeCategories = categories.filter(
+    (c: ShopCategoryItem) => c.status === 'active',
+  )
   return (
     <>
       <section className="bg-emerald-50/50 py-10">
@@ -87,49 +37,63 @@ function RouteComponent() {
           </p>
         </div>
       </section>
-
       <section className="mx-auto w-full max-w-full xl:container px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
-          {categories.map((category) => (
-            <a
-              key={category.id}
-              href={category.href}
-              className={`category-hero-card group relative block overflow-hidden rounded-[2.5rem] border p-8 shadow-sm lg:p-12 ${category.cardClass}`}
-            >
-              <div className="flex flex-col items-center gap-10 lg:flex-row">
-                <div className="flex-1 space-y-4">
-                  <div
-                    className={`inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold shadow-sm ${category.chipClass}`}
+          {activeCategories.length === 0 ? (
+            <div className="rounded-3xl border border-emerald-100 bg-emerald-50 p-8 text-center text-slate-600 md:col-span-2">
+              Belum ada kategori aktif.
+            </div>
+          ) : (
+            activeCategories.map(
+              (category: ShopCategoryItem, index: number) => {
+                const style = CARD_STYLES[index % CARD_STYLES.length]
+                return (
+                  <a
+                    key={category._id}
+                    href={`/categories/${encodeURIComponent(category.slug)}`}
+                    className={`category-hero-card group relative block overflow-hidden rounded-[2.5rem] border p-8 shadow-sm lg:p-12 ${style.cardClass}`}
                   >
-                    <CategoryIcon kind={category.icon} />
-                    <span>{category.count}</span>
-                  </div>
-                  <h2 className="font-display text-4xl font-bold text-slate-900 lg:text-5xl">
-                    {category.title}
-                  </h2>
-                  <p className="text-lg leading-relaxed text-slate-600">
-                    {category.description}
-                  </p>
-                  <div
-                    className={`flex items-center gap-2 text-lg font-bold ${category.textClass}`}
-                  >
-                    <span>Explore Collection</span>
-                    <ArrowRight className="arrow-icon h-5 w-5 transition-transform" />
-                  </div>
-                </div>
-                <div className="aspect-square w-full lg:w-1/2">
-                  <img
-                    src={category.image}
-                    alt={category.title}
-                    className="h-full w-full rounded-4xl object-cover shadow-xl"
-                  />
-                </div>
-              </div>
-            </a>
-          ))}
+                    <div className="flex flex-col items-center gap-10 lg:flex-row">
+                      <div className="flex-1 space-y-4">
+                        <div
+                          className={`inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold shadow-sm ${style.chipClass}`}
+                        >
+                          <CategoryIcon kind={inferIconKind(category.name)} />
+                          <span>
+                            {category.count.toLocaleString()} Products
+                          </span>
+                        </div>
+                        <h2 className="font-display text-4xl font-bold text-slate-900 lg:text-5xl">
+                          {category.name}
+                        </h2>
+                        <p className="text-lg leading-relaxed text-slate-600">
+                          {category.description || category.slug}
+                        </p>
+                        <div
+                          className={`flex items-center gap-2 text-lg font-bold ${style.textClass}`}
+                        >
+                          <span>Explore Collection</span>
+                          <ArrowRight className="arrow-icon h-5 w-5 transition-transform" />
+                        </div>
+                      </div>
+                      <div className="aspect-square w-full lg:w-1/2">
+                        <img
+                          src={
+                            category.image ||
+                            'https://images.unsplash.com/photo-1450778869180-41d0601e046e?auto=format&fit=crop&w=600&q=80'
+                          }
+                          alt={category.name}
+                          className="h-full w-full rounded-4xl object-cover shadow-xl"
+                        />
+                      </div>
+                    </div>
+                  </a>
+                )
+              },
+            )
+          )}
         </div>
       </section>
-
       <section className="bg-slate-50 py-10">
         <div className="mx-auto w-full max-w-full xl:container px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-[4rem] bg-emerald-500 p-10 lg:p-20">

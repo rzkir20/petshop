@@ -1,5 +1,7 @@
 import express from "express";
 
+import multer from "multer";
+
 import {
   create,
   getById,
@@ -13,6 +15,7 @@ import { validateBody } from "../middlewares/validate";
 import { slugPattern } from "../hooks/helper";
 
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.get("/", list);
 
@@ -20,6 +23,7 @@ router.get("/:id", getById);
 
 router.post(
   "/",
+  upload.single("image"),
   validateBody({
     name: { required: true, minLen: 1 },
     description: { required: false, minLen: 1 },
@@ -35,7 +39,7 @@ router.post(
   create,
 );
 
-router.patch("/:id", update);
+router.patch("/:id", upload.single("image"), update);
 router.delete("/:id", remove);
 
 export default router;
